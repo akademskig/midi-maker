@@ -8,90 +8,77 @@ import { LinearProgress } from "@material-ui/core";
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
-const DURATION_UNIT = 0.2;
-const DEFAULT_NOTE_DURATION = DURATION_UNIT;
-
 class AppPiano extends React.Component {
     static defaultProps = {
         notesRecorded: false,
     };
 
-    state = {
-        keysDown: {},
-        noteDuration: DEFAULT_NOTE_DURATION,
-        startBreak: 0,
-        endBreak: 0,
-        playing: false,
-        startTime: Date.now()
-    };
+    notesList = []
 
-    duration = null
+    prevNote = null
+    absTime = 0
+    prevStopped = false
+    started = false
     onPlayNoteInput = midiNumber => {
-        this.notesRecorded = false
-        const startTime = Date.now()
-        const endBreak = Date.now()
-        if (this.state.playing && this.props.recording.mode !== 'RECORDING' &&
-            (Math.round(this.state.startBreak / 1000) !== Math.round(endBreak / 1000))) {
-            const duration = Math.round((Date.now() - this.state.startBreak) / 1000)
-            this.recordNotes([null], duration);
+        if (this.prevNote === midiNumber && !this.prevStopped)
+            return
+        if (this.props.recording.currentTime === 0 && !this.started) {
+            this.setState({ absTime: Date.now() })
+            this.started = true
         }
-
-        this.setState({
+        const startTime = Date.now()
+        const recordedNote = {
+            midiNumber: midiNumber,
             startTime,
-            endBreak,
-            playing: true
-        });
+            endTime: null,
+            duration: null
+        }
+        this.notesList.push(recordedNote)
+        this.prevNote = midiNumber
+        this.prevStopped = false
     };
 
     onStopNoteInput = (midiNumber, { prevActiveNotes }) => {
-        if (!this.notesRecorded) {
-            const endTime = Date.now()
-            const duration = ((endTime - this.state.startTime) / 1000)
-            const startBreak = Date.now()
-            this.recordNotes(prevActiveNotes, duration);
-
-            this.setState({
-                notesRecorded: true,
-                noteDuration: duration,
-                startBreak: startBreak
-            });
-        }
-    };
-    recordNotes = (midiNumbers, duration) => {
         if (this.props.recording.mode !== 'RECORDING') {
-            this.prevNote = midiNumbers
             return;
         }
+        const startedNoteIndex = this.notesList.findIndex(n =>
+            n.midiNumber === midiNumber
+        )
 
-        this.prevNote = midiNumbers
+        const startedNote = this.notesList.splice(startedNoteIndex, 1)
+        if (!startedNote[0])
+            return
+        let endTime = Date.now()
+        const duration = endTime - startedNote[0].startTime
+        // console.log(prevActiveNotes, duration, startedNote[0].startTime / 1000, endTime / 1000)
+
+        this.recordNotes(prevActiveNotes, duration, startedNote[0].startTime);
+        this.prevStopped = true
+
+    };
+    recordNotes = (midiNumbers, duration, startTime) => {
+        if (this.props.recording.mode !== 'RECORDING') {
+            return;
+        }
         const newEvents = midiNumbers.map(midiNumber => {
             return {
                 midiNumber,
-                time: this.props.recording.currentTime,
-                duration: duration,
+                time: (startTime - this.state.absTime) / 1000,
+                duration: duration / 1000,
             };
         });
         this.props.setRecording({
             events: this.props.recording.events.concat(newEvents),
-            currentTime: this.props.recording.currentTime + duration,
+            currentTime: (Date.now() + duration - this.state.absTime) / 1000,
         });
     };
 
     componentWillReceiveProps = (curr) => {
-        if (!curr.recordingOn) {
-            this.setState({
-                endBreak: 0,
-                startBreak: 0,
-                playing: false,
-
-            })
+        if (curr.recordingOn && !this.props.recordingOn) {
+            const elapsed = Date.now() - (this.props.recording.currentTime * 1000 + this.absTime)
+            this.setState({ absTime: elapsed + this.absTime })
         }
-        else {
-            this.setState({
-                startTime: Date.now()
-            })
-        }
-
     }
 
     render() {

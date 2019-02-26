@@ -31,7 +31,6 @@ const styles = theme => ({
 });
 
 class PianoController extends Component {
-
     constructor(props) {
         super(props)
         this.state = {
@@ -50,7 +49,6 @@ class PianoController extends Component {
             paused: true
         }
         this.scheduledEvents = [];
-        console.log("nj")
     }
 
     getRecordingEndTime = () => {
@@ -85,8 +83,6 @@ class PianoController extends Component {
                 setTimeout(() => {
                     const currentEvents = this.state.recording.events.filter(event => {
                         return event.time <= time && event.time + event.duration > time
-
-
                     });
                     this.setRecording({
                         currentEvents,
@@ -118,6 +114,7 @@ class PianoController extends Component {
     onClickClear = () => {
         this.onClickStop();
         this.setRecording({
+            mode: "NOT_RECORDING",
             events: [],
             currentEvents: [],
             currentTime: 0,
