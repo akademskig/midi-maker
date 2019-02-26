@@ -1,28 +1,38 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom'
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { MainRouter } from './MainRouter';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
+  palette: {
+    primary: {
+      // light: will be calculated from palette.primary.main,
+      main: "#282c34",
+      contrastText: "#D3D6DB"
+      // dark: will be calculated from palette.primary.main,
+      // contrastText: will be calculated to contrast with palette.primary.main
+    },
+    secondary: {
+      main: '#70213D',
+      // dark: will be calculated from palette.secondary.main,
+      contrastText: '#FBE9EE',
+    },
+    // error: will use the default color
+  },
+});
+
+
+const App = () => (
+
+  <BrowserRouter>
+    <MuiThemeProvider theme={theme} >
+      <MainRouter />
+    </MuiThemeProvider>
+  </BrowserRouter>
+
+)
 
 export default App;
