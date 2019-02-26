@@ -135,7 +135,9 @@ class PianoController extends Component {
         this.setState({
             recordingOn: false
         })
-
+    }
+    onClickSave = () => {
+        console.log(this.state.recording.events)
     }
     onChangeFirstNote = (event) => {
         this.setState({
@@ -249,6 +251,7 @@ class PianoController extends Component {
                                 <Button onClick={this.onClickStop}>Stop</Button>
                                 <Button onClick={this.onClickClear}>Clear</Button>
                                 <Button onClick={this.onClickUndo}>Undo</Button>
+                                <Button onClick={this.onClickSave}>Save</Button>
                             </div>
                             <div className="mt-5">
                                 <strong>Recorded notes</strong>

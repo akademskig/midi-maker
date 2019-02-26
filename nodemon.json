@@ -1,0 +1,7 @@
+{
+    "verbose": true,
+    "watch": [
+        "./src"
+    ],
+    "exec": "babel -f .babelrc --extensions .ts src -d  dist && node dist/index.js"
+}

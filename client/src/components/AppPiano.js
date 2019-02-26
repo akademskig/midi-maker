@@ -51,7 +51,7 @@ class AppPiano extends React.Component {
             return
         let endTime = Date.now()
         const duration = endTime - startedNote[0].startTime
-        // console.log(prevActiveNotes, duration, startedNote[0].startTime / 1000, endTime / 1000)
+        console.log(prevActiveNotes, duration, startedNote[0].startTime / 1000, endTime / 1000)
 
         this.recordNotes(prevActiveNotes, duration, startedNote[0].startTime);
         this.prevStopped = true
