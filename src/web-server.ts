@@ -1,5 +1,5 @@
 import path from 'path'
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
@@ -7,6 +7,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { config } from "./config"
 import { Logger } from './utils/logger';
+import midiRoutes from "./routes/midi.routes"
 
 export class WebServer {
 
@@ -22,6 +23,8 @@ export class WebServer {
         app.use(helmet())
         // enable CORS - Cross Origin Resource Sharing
         app.use(cors())
+        app.use("/", this.reqLogger.bind(this))
+        app.use("/", midiRoutes)
         const CURRENT_WORKING_DIR = process.cwd()
         app.use(express.static(path.join(CURRENT_WORKING_DIR, 'client/build')));
 
@@ -32,7 +35,10 @@ export class WebServer {
             this.log.info(`Web server started on port ${config.PORT}.`)
         })
     }
+    reqLogger(req: Request, res: Response, next: NextFunction) {
+        this.log.info(`Url: ${req.path}, body:`, JSON.stringify(req.body))
+        next()
+    }
 }
-
 
 
