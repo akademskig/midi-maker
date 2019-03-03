@@ -5,6 +5,7 @@ import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Input, Switch, 
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import InstrumentListWrapper from "../providers/InstrumentListProvider";
+import { saveMidi } from "../services/midiService"
 import _ from 'lodash';
 
 const styles = theme => ({
@@ -38,7 +39,7 @@ class PianoController extends Component {
                 first: 43,
                 last: 67,
             },
-            instrumentName: "",
+            instrumentName: "acoustic_grand_piano",
             recording: {
                 mode: 'NOT_RECORDING',
                 events: [],
@@ -137,7 +138,8 @@ class PianoController extends Component {
         })
     }
     onClickSave = () => {
-        console.log(this.state.recording.events)
+        const instrumentIndex = this.props.instrumentList.findIndex(i => i === this.state.instrumentName)
+        saveMidi(this.state.recording.events, instrumentIndex)
     }
     onChangeFirstNote = (event) => {
         this.setState({
