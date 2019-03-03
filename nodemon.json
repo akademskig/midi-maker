@@ -3,5 +3,6 @@
     "watch": [
         "./src"
     ],
-    "exec": "babel -f .babelrc --extensions .ts src -d  dist && node dist/index.js"
+    "exec": "ts-node ./src/index.ts",
+    "ext": "ts"
 }
