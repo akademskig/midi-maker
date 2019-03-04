@@ -3,10 +3,20 @@ import { Piano, KeyboardShortcuts } from 'react-piano';
 import SoundfontProvider from "../providers/SoundFontProvider";
 import PropTypes from "prop-types"
 import { LinearProgress } from "@material-ui/core";
-
+import { withStyles } from '@material-ui/core/styles';
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
+
+const styles = theme => ({
+    piano: {
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: "300px"
+    }
+});
 class AppPiano extends React.Component {
     static defaultProps = {
         notesRecorded: false,
@@ -41,17 +51,20 @@ class AppPiano extends React.Component {
         if (this.props.recording.mode !== 'RECORDING') {
             return;
         }
+        this.notesList = this.notesList.filter(nl =>
+            prevActiveNotes.includes(nl.midiNumber)
+        )
         const startedNoteIndex = this.notesList.findIndex(n =>
             n.midiNumber === midiNumber
         )
-
         const startedNote = this.notesList.splice(startedNoteIndex, 1)
+
         if (!startedNote[0])
             return
         let endTime = Date.now()
         const duration = endTime - startedNote[0].startTime
 
-        this.recordNotes(prevActiveNotes, duration, startedNote[0].startTime);
+        this.recordNotes(midiNumber, duration, startedNote[0].startTime);
         this.prevStopped = true
 
     };
@@ -59,7 +72,8 @@ class AppPiano extends React.Component {
         if (this.props.recording.mode !== 'RECORDING') {
             return;
         }
-        const newEvents = midiNumbers.map(midiNumber => {
+
+        const newEvents = [midiNumbers].map(midiNumber => {
             return {
                 midiNumber,
                 time: (startTime - this.state.absTime) / 1000,
@@ -81,6 +95,7 @@ class AppPiano extends React.Component {
 
     render() {
         const {
+            classes,
             playNote,
             stopNote,
             recording,
@@ -99,13 +114,13 @@ class AppPiano extends React.Component {
         const activeNotes =
             mode === 'PLAYING' ? currentEvents.map(event => event.midiNumber) : null;
         return (
-            <div >
+            <div>
                 < SoundfontProvider
                     instrumentName={instrumentName || "acoustic_grand_piano"}
                     audioContext={audioContext}
                     hostname={soundfontHostname}
                     render={({ isLoading, playNote, stopNote }) => (
-                        <div style={{ height: "300px" }}>
+                        <div className={classes.piano}>
                             {isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
                             <Piano
                                 noteRange={noteRange}
@@ -132,4 +147,4 @@ AppPiano.propTypes = {
     lastNote: PropTypes.string,
     instrumentName: PropTypes.string
 }
-export default AppPiano
+export default withStyles(styles)(AppPiano)
