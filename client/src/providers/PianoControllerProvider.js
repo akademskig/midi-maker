@@ -103,7 +103,6 @@ class PianoControllerProvider extends React.Component {
         })
     }
     onClickSave = () => {
-        console.log(this.props.instrumentList)
         const instrumentIndex = this.props.instrumentList.findIndex(i => i === this.state.instrumentName)
         saveMidi(this.state.recording.events, instrumentIndex)
     }
@@ -162,7 +161,8 @@ class PianoControllerProvider extends React.Component {
             recordingOn: this.state.recordingOn,
             recording: this.state.recording,
             setRecording: this.setRecording,
-            instrumentName: this.state.instrumentName
+            instrumentName: this.state.instrumentName,
+            instrumentList: this.props.instrumentList
         }
         return (
             React.Children.map(this.props.children, (child) => {
