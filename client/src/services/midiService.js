@@ -4,7 +4,7 @@ import Midi from "@tonejs/midi"
 const apiUrl = `${window.location.protocol}//${window.location.hostname}:${config.PORT}`
 
 export const saveMidi = (midiData, instrumentNumber) => {
-    encodeMidi(midiData, instrumentNumber)
+    const midi = encodeMidi(midiData, instrumentNumber)
     return fetch(`${apiUrl}/midis/save`, {
         method: 'POST',
         headers: {
@@ -12,7 +12,7 @@ export const saveMidi = (midiData, instrumentNumber) => {
             "Content-Type": "application/json"
             //   'Authorization': 'Bearer ' + credentials.t
         },
-        body: JSON.stringify(midiData)
+        body: JSON.stringify(midi)
     }).then((response) => {
         return response.json()
     }).catch((err) => {
@@ -33,4 +33,5 @@ const encodeMidi = (midiTrack, instrumentNumber) => {
             duration: mt.duration
         })
     })
+    return midi
 }
