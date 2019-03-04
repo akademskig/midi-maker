@@ -1,10 +1,11 @@
 import React, { Component } from "react"
 import { withStyles } from '@material-ui/core/styles';
-import { Paper, Typography } from "@material-ui/core";
 import AppPiano from "../components/AppPiano"
 
 import 'react-piano/dist/styles.css';
-import PianoController from "../containers/PianoController";
+import PianoController from "../components/PianoController";
+import PianoControllerProvider from "../providers/PianoControllerProvider";
+
 const styles = theme => ({
     root: {
         flexGrow: 1,
@@ -22,12 +23,12 @@ const styles = theme => ({
 
 class NewMidi extends Component {
     render() {
-        const { classes } = this.props;
         return (
             <div >
-
-                <PianoController></PianoController>
-
+                <PianoControllerProvider>
+                    <PianoController ></PianoController>
+                    <AppPiano ></AppPiano>
+                </PianoControllerProvider>
             </div>
         )
     }

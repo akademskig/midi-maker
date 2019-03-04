@@ -1,6 +1,5 @@
 
 import React from 'react';
-import PropTypes from 'prop-types';
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
 const InstrumentListWrapper = (ComponentToWrap) => {

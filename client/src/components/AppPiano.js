@@ -1,6 +1,5 @@
-import React, { Component } from "react"
-import MidiList from "../containers/MusicList";
-import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
+import React from "react"
+import { Piano, KeyboardShortcuts } from 'react-piano';
 import SoundfontProvider from "../providers/SoundFontProvider";
 import PropTypes from "prop-types"
 import { LinearProgress } from "@material-ui/core";
@@ -51,7 +50,6 @@ class AppPiano extends React.Component {
             return
         let endTime = Date.now()
         const duration = endTime - startedNote[0].startTime
-        console.log(prevActiveNotes, duration, startedNote[0].startTime / 1000, endTime / 1000)
 
         this.recordNotes(prevActiveNotes, duration, startedNote[0].startTime);
         this.prevStopped = true

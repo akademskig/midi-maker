@@ -1,26 +1,22 @@
 import React from 'react'
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import LibraryMusicRounded from '@material-ui/icons/LibraryMusicRounded'
 import AddBoxRounded from '@material-ui/icons/AddBoxRounded'
-import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 
 
 import { Link, withRouter } from 'react-router-dom'
-import { Paper, Icon, Divider } from '@material-ui/core';
 
 const isActive = (history, path) => {
-    if (history.location.pathname == path)
+    if (history.location.pathname === path)
         return { color: '#2196f3' }
     else
         return { color: '#fff' }
 }
 const styles = theme => ({
     toolbar: {
-        padding: "10px",
         backgroundColor: theme.palette.primary.main,
     },
     paper: {

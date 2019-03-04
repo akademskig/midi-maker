@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { withStyles } from '@material-ui/core/styles';
-import { Paper, Typography } from "@material-ui/core";
 import MusicList from "../containers/MusicList";
 
 const styles = theme => ({
@@ -21,7 +20,6 @@ const styles = theme => ({
 
 class Home extends Component {
     render() {
-        const { classes } = this.props;
         return (
             <div >Hi
                 <MusicList></MusicList>
