@@ -5,7 +5,7 @@ import AppPiano from "../components/AppPiano"
 import 'react-piano/dist/styles.css';
 import PianoController from "../components/PianoController";
 import PianoControllerProvider from "../providers/PianoControllerProvider";
-import { NotesGrid } from "../components/NotesGrid";
+import NotesGrid  from "../components/NotesGrid";
 
 const styles = theme => ({
     root: {

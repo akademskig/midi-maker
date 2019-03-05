@@ -1,71 +1,73 @@
 import React from "react";
 import { MidiNumbers } from 'react-piano';
-export class NotesGrid extends React.Component {
+import Dimensions from 'react-dimensions';
 
-    state = {
-        display: "grid",
-        gridTemplateColumns: "auto auto"
-    }
-
+ class NotesGrid extends React.Component {
 
     render() {
         const notes = []
         for (let i = this.props.noteRange.first; i <= this.props.noteRange.last; i++)
             notes.push(MidiNumbers.getAttributes(i))
-        console.log(notes)
 
         return (
-            <div className="gridContainer">
-                {notes.map((n, i) => <div key={i} className="noteList" > {n.note}</div>)}
-                <Canvas notes></Canvas>
+            <div className="gridContainer" style={{
+             height: window.innerHeight/2, bottom:window.innerHeight/4}}>
+                <Canvas containerHeight={this.props.containerHeight}containerWidth={this.props.containerWidth}notes={notes}></Canvas>
 
             </div>
         )
     }
 }
 
+export default Dimensions()(NotesGrid)
 const canvasStyle = {
-    border: "1px solid black"
+    background: "white"
 }
+const RECT_HEIGHT =30
+const RECT_WIDTH=30
+const TOP_OFFSET=0
+const RECT_SPACE=1
+const RECT_COLOR="rgba(3,34,56,0.5)"
 class Canvas extends React.Component {
+
+
     draw = (canvas) => {
 
-        if (canvas.getContext) {
-            var context = canvas.getContext('2d');
+        let c = canvas.getContext("2d")
+        canvas.width= this.props.containerWidth
+        canvas.height=this.props.notes.length*RECT_HEIGHT + (RECT_SPACE*this.props.notes.length)
 
-            for (var x = 0.5; x < 100; x += 10) {
-                context.moveTo(x, 0);
-                context.lineTo(x, 100);
-            }
-
-            for (var y = 0.5; y < 100; y += 10) {
-                context.moveTo(0, y);
-                context.lineTo(100, y);
-
-            }
-
-            context.strokeStyle = 'grey';
-            context.stroke();
-
-        }
+        this.props.notes.forEach((n, i)=>{
+          for(let j=0; j< 100; j++){
+            c.fillStyle="rgba(3,34,56,0.5)"
+            c.fillRect((j*30 +RECT_SPACE*j),(i*30+RECT_SPACE*i),RECT_WIDTH,RECT_HEIGHT);
+             if(j==0){
+                c.fillStyle="rgba(3,34,56,0.5)"
+                c.fillRect((j*30 +RECT_SPACE*j),(i*30+RECT_SPACE*i),RECT_WIDTH,RECT_HEIGHT);
+                c.fillStyle="black"
+                c.font="12px Arial"
+                c.fillText(n.note,3, 20+i*31)}
+          }
+        });
     }
-
     showCoords = (event) => {
         var x = event.clientX - 10;
         var y = event.clientY - 10;
         var coords = "X coordinates: " + x + ", Y coordinates: " + y;
-        console.log(coords)
     }
-    componentDidMount() {
+    componentWillReceiveProps(){
+        const canvas = this.refs.canvas
+        this.draw(canvas)
+    }
+    componentDidUpdate() {
         const canvas = this.refs.canvas
         this.draw(canvas)
     }
     render() {
         return (
             <div>
-                <canvas ref="canvas" width={640} height={425} style={canvasStyle} onClick={this.showCoords} />
+                <canvas ref="canvas"  style={canvasStyle} onClick={this.showCoords} />
             </div>
         )
     }
 }
-export default Canvas
