@@ -14,7 +14,7 @@ const styles = theme => ({
         bottom: 0,
         left: 0,
         right: 0,
-        height: "300px"
+        height: window.innerHeight / 4
     }
 });
 class AppPiano extends React.Component {

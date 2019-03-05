@@ -1,0 +1,14 @@
+.gridContainer {
+  width: 100%;
+  position: fixed;
+  overflow: scroll;
+}
+::-webkit-scrollbar {
+  width: 2px;
+  /* remove scrollbar space */
+  background: white;
+  /* optional: just make scrollbar invisible */
+}
+::-webkit-scrollbar-thumb {
+  background: "blue";
+}
