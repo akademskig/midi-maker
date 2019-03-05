@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom'
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { MainRouter } from './MainRouter';
-
+import "./styles/css/index.css"
 const theme = createMuiTheme({
   typography: {
     useNextVariants: true,

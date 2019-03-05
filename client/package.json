@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "watch-less": "less-watch-compiler ./src/styles/less ./src/styles/css",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -30,5 +31,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "less": "^3.9.0",
+    "less-watch-compiler": "^1.13.0",
+    "watch-less": "0.0.4"
+  }
 }
