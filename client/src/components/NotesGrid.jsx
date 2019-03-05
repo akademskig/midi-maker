@@ -28,17 +28,18 @@ const RECT_WIDTH=30
 const TOP_OFFSET=0
 const RECT_SPACE=1
 const RECT_COLOR="rgba(3,34,56,0.5)"
+const TIME=100
 class Canvas extends React.Component {
 
 
     draw = (canvas) => {
 
         let c = canvas.getContext("2d")
-        canvas.width= this.props.containerWidth
+        canvas.width= TIME * RECT_WIDTH * RECT_SPACE
         canvas.height=this.props.notes.length*RECT_HEIGHT + (RECT_SPACE*this.props.notes.length)
 
         this.props.notes.forEach((n, i)=>{
-          for(let j=0; j< 100; j++){
+          for(let j=0; j< TIME; j++){
             c.fillStyle="rgba(3,34,56,0.5)"
             c.fillRect((j*30 +RECT_SPACE*j),(i*30+RECT_SPACE*i),RECT_WIDTH,RECT_HEIGHT);
              if(j==0){
