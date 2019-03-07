@@ -149,17 +149,35 @@ class Canvas extends React.Component {
         if (rect.x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
             this.props.canvasContainer.scroll(rect.x, rect.y)
         }
+
         const lastEvent = {
             midiNumber: rect.midiNumber,
             time: (rect.x - (RECT_WIDTH) - this.offsetFirst) / RECT_WIDTH / RECT_TIME,
             duration: 1 / RECT_TIME
         }
-        this.playNote(lastEvent)
-        this.props.setRecording({
-            events: this.props.recording.events.concat(lastEvent),
-            currentTime: (lastEvent.time + lastEvent.duration) > this.props.recording.currentTime ?
-                lastEvent.time + lastEvent.duration : this.props.recording.currentTime
-        })
+
+        let duplicate = this.props.recording.events.findIndex(e => _.isEqual(e, lastEvent))
+        if (duplicate !== -1 && this.props.recording.events.length > 0) {
+            let lastTime = 0
+            this.props.recording.events.splice(duplicate, 1)
+            this.props.recording.events.forEach(e => {
+                if (lastTime < e.time)
+                    lastTime = e.time
+            })
+            this.props.setRecording({
+                events: this.props.recording.events,
+                currentTime: (lastEvent.time + lastEvent.duration) >= this.props.recording.currentTime ?
+                    lastTime + 1 / RECT_TIME : this.props.recording.currentTime
+            })
+        }
+        else {
+            this.playNote(lastEvent)
+            this.props.setRecording({
+                events: this.props.recording.events.concat(lastEvent),
+                currentTime: (lastEvent.time + lastEvent.duration) > this.props.recording.currentTime ?
+                    lastEvent.time + lastEvent.duration : this.props.recording.currentTime
+            })
+        }
         const canvas = this.refs.canvas
         this.drawInitial(canvas)
     }
