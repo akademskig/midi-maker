@@ -2,7 +2,9 @@ import React from "react";
 import { MidiNumbers } from 'react-piano';
 import Dimensions from 'react-dimensions';
 import _ from "lodash"
-
+import SoundfontProvider from "../providers/SoundFontProvider";
+import { CircularProgress } from "@material-ui/core";
+import { element } from "prop-types";
 class NotesGrid extends React.Component {
     render() {
         const notes = []
@@ -12,16 +14,25 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer" style={{
-                height: window.innerHeight / 2 - 30, bottom: window.innerHeight / 4
+                height: window.innerHeight / 2-30, bottom: window.innerHeight / 4
             }}>
+                < SoundfontProvider
+                    instrumentName={this.props.instrumentName || "acoustic_grand_piano"}
+                    // audioContext={audioContext}
+                    // hostname={soundfontHostname}
+
+                    render={({ isLoading, playNote, stopNote }) => (
                 <Canvas
                     midiOffset={this.props.noteRange.first}
                     recording={this.props.recording}
                     notes={notes}
+                    playNote={playNote}
+                    stopNote={stopNote}
+                    loading={isLoading}
                     canvasContainer={canvasContainer}
                     setRecording={this.props.setRecording}
                 >
-                </Canvas>
+                </Canvas>)}></SoundfontProvider>
             </div>
         )
     }
@@ -32,13 +43,13 @@ const canvasStyle = {
     background: "rgba(4,32,55,0.7)"
 }
 let RECT_HEIGHT = 15
-const RECT_WIDTH = 15
+const RECT_WIDTH = 30
 const RECT_SPACE = 0.5
 const RECT_COLOR = "rgba(4,32,55,1)"
 const FIRST_RECT_COLOR = "rgb(255,255,255)"
 const NOTE_COLOR = "#61dafb"
 const START_TIME = window.innerWidth / (RECT_WIDTH + RECT_SPACE)
-const RECT_TIME = 10
+const RECT_TIME =5
 class Canvas extends React.Component {
     coordsMap = []
     eventsRect = []
@@ -52,10 +63,10 @@ class Canvas extends React.Component {
         let c = canvas.getContext("2d")
         canvas.width = (xLength * (RECT_WIDTH + RECT_SPACE))
         this.canvasWidth = canvas.width
-        canvas.height = 370
+        canvas.height =this.props.canvasContainer.getBoundingClientRect().height-16
         RECT_HEIGHT = (canvas.height - RECT_SPACE * this.props.notes.length) / this.props.notes.length
         this.fontSize = RECT_HEIGHT * 0.8
-        this.offsetFirst = RECT_WIDTH * this.fontSize / 7
+        this.offsetFirst = this.fontSize
         this.coordsMap = []
         this.props.notes.forEach((n, i) => {
             for (let j = 0; j < xLength; j++) {
@@ -81,6 +92,7 @@ class Canvas extends React.Component {
                 c.fillStyle = NOTE_COLOR
                 c.clearRect(x, y, width, RECT_HEIGHT);
                 c.fillRect(x, y, width, RECT_HEIGHT);
+
             });
         }
         if (this.eventsRect.length === 0) {
@@ -101,16 +113,30 @@ class Canvas extends React.Component {
         )
         if (!rect || this.props.recording.mode !== "RECORDING")
             return
+            console.log(this.props.canvasContainer.getBoundingClientRect().width)
+            if(rect.x>=this.props.canvasContainer.getBoundingClientRect().width-200){
+                this.props.canvasContainer.scroll(rect.x,rect.y)
+            }
         const lastEvent = {
             midiNumber: rect.midiNumber,
             time: (rect.x - (RECT_WIDTH) - this.offsetFirst) / RECT_WIDTH / RECT_TIME,
             duration: 1 / RECT_TIME
         }
+      this.playNote(lastEvent)
         this.props.setRecording({
             events: this.props.recording.events.concat(lastEvent),
+            currentTime:(lastEvent.time+lastEvent.duration)> this.props.recording.currentTime?
+            lastEvent.time+lastEvent.duration: this.props.recording.currentTime
         })
+        console.log(this.props.recording)
         const canvas = this.refs.canvas
         this.drawInitial(canvas)
+
+    }
+
+    playNote=(lastEvent)=>{
+        this.props.playNote(lastEvent.midiNumber)
+        window.setTimeout(()=> this.props.stopNote(lastEvent.midiNumber), lastEvent.duration*1000)
     }
     componentWillReceiveProps(newProps) {
         const canvas = this.refs.canvas
@@ -120,12 +146,14 @@ class Canvas extends React.Component {
     }
     componentDidUpdate() {
         const canvas = this.refs.canvas
+        if(canvas)
         this.drawInitial(canvas)
     }
     render() {
         return (
             <div>
-                <canvas id="canvas" ref="canvas" style={canvasStyle} onClick={this.showCoords} />
+                {this.props.loading? <CircularProgress></CircularProgress> :
+                <canvas id="canvas" ref="canvas" style={canvasStyle} onClick={this.showCoords} />}
             </div>
         )
     }
