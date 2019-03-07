@@ -14,9 +14,11 @@ class PianoControllerProvider extends React.Component {
         recording: {
             mode: 'NOT_RECORDING',
             events: [],
+            playing: false,
             currentTime: 0,
             currentEvents: [],
         },
+        state:"STOPPED",
         recordingOn: false,
     }
     scheduledEvents = [];
@@ -37,8 +39,14 @@ class PianoControllerProvider extends React.Component {
     };
 
     onClickPlay = () => {
+        if(this.state.playing)
+        return
+       this.setState({
+           playing:true
+       })
         this.setRecording({
             mode: 'PLAYING',
+            state: "PLAYING",
         });
         this.setState({ recordingOn: false })
         const startAndEndTimes = _.uniq(
@@ -62,7 +70,7 @@ class PianoControllerProvider extends React.Component {
         });
         // Stop at the end
         setTimeout(() => {
-            this.onClickStop();
+            this.onFinish();
         }, this.getRecordingEndTime() * 1000);
     };
 
@@ -72,16 +80,34 @@ class PianoControllerProvider extends React.Component {
         });
         this.setRecording({
             mode: "NOT_RECORDING",
+            state: "STOPPED",
             currentEvents: [],
         });
+        this.setState({
+            playing:false
+        })
         this.setState({ recordingOn: false })
     };
-
+    onFinish = () => {
+        this.scheduledEvents.forEach(scheduledEvent => {
+            clearTimeout(scheduledEvent);
+        });
+        this.setRecording({
+            mode: "NOT_RECORDING",
+            state:"PLAYING",
+            currentEvents: [],
+        });
+        this.setState({
+            playing:false
+        })
+        this.setState({ recordingOn: false })
+    }
     onClickClear = () => {
         this.onClickStop();
         this.setRecording({
             mode: "NOT_RECORDING",
             events: [],
+            state: "STOPPED",
             currentEvents: [],
             currentTime: 0,
         });
@@ -93,10 +119,11 @@ class PianoControllerProvider extends React.Component {
             return
         }
         const eventsLength = this.state.recording.events.length
+        const newEvents=this.state.recording.events.slice(0, eventsLength - 1)
         this.setRecording({
             mode: "NOT_RECORDING",
-            events: this.state.recording.events.slice(0, eventsLength - 1),
-            currentTime: this.state.recording.events[eventsLength - 1].time + this.state.recording.events[eventsLength - 1].duration
+            events: newEvents,
+            currentTime: newEvents[newEvents.length - 1].time +newEvents[newEvents.length - 1].duration
         })
         this.setState({
             recordingOn: false
@@ -128,7 +155,9 @@ class PianoControllerProvider extends React.Component {
             instrumentName: event.target.value,
         });
     };
+    onClickAddChannel = () => {
 
+    }
     toggleRecording = (event, checked) => {
         if (checked) {
             this.setRecording({

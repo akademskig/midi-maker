@@ -48,7 +48,7 @@ const NOTE_COLOR = "#61dafb"
 const START_TIME = window.innerWidth / (RECT_WIDTH + RECT_SPACE)
 const RECT_TIME = 5
 const BAR_COLOR = "#d13a1f"
-
+const BAR_WIDTH = 4
 class Canvas extends React.Component {
     coordsMap = []
     eventsRect = []
@@ -58,7 +58,7 @@ class Canvas extends React.Component {
     offsetFirst = null
     lastRect = null
     timers = []
-
+    state = { playing: false }
 
     drawInitial = (canvas, timer) => {
         let xLength = (this.props.recording.currentTime * RECT_TIME) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.props.recording.currentTime * RECT_TIME + 5
@@ -98,11 +98,7 @@ class Canvas extends React.Component {
                     if (x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
                         this.props.canvasContainer.scroll(x, y)
                     }
-
             });
-        }
-        if (this.eventsRect.length === 0) {
-
         }
         this.eventsRect.forEach(eventRect => {
             c.fillStyle = NOTE_COLOR
@@ -111,31 +107,36 @@ class Canvas extends React.Component {
         })
 
         if (timer) {
-            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst
+            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst + RECT_WIDTH / 2
             c.fillStyle = BAR_COLOR
-            c.fillRect(x, 0, 5, canvas.height)
+            c.fillRect(x, 0, BAR_WIDTH, canvas.height)
             this.lastRect = x
         }
-        if (this.lastRect) {
+        if (this.lastRect && !timer) {
             c.fillStyle = BAR_COLOR
-            c.fillRect(this.lastRect, 0, 5, canvas.height)
+            c.fillRect(this.lastRect, 0, BAR_WIDTH, canvas.height)
         }
-
     }
 
     play = () => {
+        if (this.state.playing)
+            return
+        this.setState({ playing: true })
         const canvas = this.refs.canvas
-        for (let i = 0; i < START_TIME; i += (1 / RECT_TIME)) {
+        for (let i = 0; i < this.props.recording.currentTime; i += (1 / RECT_TIME)) {
             let t = window.setTimeout(() => {
                 let count = i
                 this.drawInitial(canvas, count)
             }, Math.ceil(i * 1000))
             this.timers.push(t)
         }
+        window.setTimeout(() => this.stop(), this.props.recording.currentTime * 1000)
     }
 
     stop = () => {
         this.timers.forEach(t => clearTimeout(t))
+        this.lastRect = null
+        this.setState({ playing: false })
     }
     showCoords = (event) => {
         var x = event.clientX + this.props.canvasContainer.scrollLeft
@@ -161,7 +162,6 @@ class Canvas extends React.Component {
         })
         const canvas = this.refs.canvas
         this.drawInitial(canvas)
-
     }
 
     playNote = (lastEvent) => {
@@ -175,7 +175,7 @@ class Canvas extends React.Component {
         }
         if (newProps.recording.mode === "PLAYING" && this.props.recording.mode !== "PLAYING")
             this.play()
-        if (newProps.recording.mode !== "PLAYING" && this.props.recording.mode === "PLAYING")
+        if (this.props.recording.state === "PLAYING" && newProps.recording.state === "STOPPED")
             this.stop()
     }
     componentDidUpdate() {
