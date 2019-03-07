@@ -5,7 +5,7 @@ import "./styles/css/index.css"
 
 const App = () => (
   <BrowserRouter>
-    <MainRouter />
+      <MainRouter/>
   </BrowserRouter>
 )
 
