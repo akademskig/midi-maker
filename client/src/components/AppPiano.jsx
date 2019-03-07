@@ -4,9 +4,8 @@ import SoundfontProvider from "../providers/SoundFontProvider";
 import PropTypes from "prop-types"
 import { LinearProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
-
+import Dimensions from '../providers/DimensionsProvider';
+import windowSize from 'react-window-size';
 
 const styles = theme => ({
     piano: {
@@ -14,7 +13,7 @@ const styles = theme => ({
         bottom: 0,
         left: 0,
         right: 0,
-        height: window.innerHeight / 4
+
     }
 });
 class AppPiano extends React.Component {
@@ -28,6 +27,8 @@ class AppPiano extends React.Component {
     absTime = 0
     prevStopped = false
     started = false
+    state={
+        pianoHeight:this.props.height/3+"px"}
     onPlayNoteInput = midiNumber => {
         if (this.prevNote === midiNumber && !this.prevStopped)
             return
@@ -91,9 +92,14 @@ class AppPiano extends React.Component {
             const elapsed = Date.now() - (this.props.recording.currentTime * 1000 + this.absTime)
             this.setState({ absTime: elapsed + this.absTime })
         }
+        if(this.props.height!==curr.height)
+        this.setState({
+            pianoHeight: curr.height/3+"px"
+        })
     }
 
     render() {
+        console.log(this.props)
         const {
             classes,
             playNote,
@@ -117,12 +123,13 @@ class AppPiano extends React.Component {
             <div>
                 < SoundfontProvider
                     instrumentName={instrumentName || "acoustic_grand_piano"}
-                    audioContext={audioContext}
-                    hostname={soundfontHostname}
+                    // audioContext={audioContext}
+                    // hostname={soundfontHostname}
                     render={({ isLoading, playNote, stopNote }) => (
-                        <div className={classes.piano}>
+                        <div className={classes.piano} style={{height:window.innerHeight/4}}>
                             {isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
                             <Piano
+
                                 noteRange={noteRange}
                                 playNote={playNote}
                                 stopNote={stopNote}
