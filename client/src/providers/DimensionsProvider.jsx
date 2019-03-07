@@ -1,17 +1,26 @@
 import React from 'react';
-import Dimensions from 'react-dimensions';
 
-class DimensionsProvider extends React.Component {
+const Dimensions =(Wrapper)=> {
+return class Dimensions extends React.Component {
+
+    state={
+        width: window.innerWidth,
+        height:window.innerHeight
+    }
+
+    componentWillMount(){
+        window.addEventListener("resize",()=>{
+            this.setState({
+                width: window.innerWidth,
+                height:window.innerHeight
+            })
+        })
+    }
     render() {
         return (
-            <div>
-                {this.props.children({
-                    containerWidth: this.props.containerWidth,
-                    containerHeight: this.props.containerHeight,
-                })}
-            </div>
+          <Wrapper {...this.state}{...this.props}></Wrapper>
         );
     }
 }
-
-export default Dimensions()(DimensionsProvider);
+}
+export default Dimensions
