@@ -11,55 +11,65 @@ class PianoControllerProvider extends React.Component {
             last: 67,
         },
         instrumentName: "acoustic_grand_piano",
-        recording: {
+        recordingPiano: {
             mode: 'NOT_RECORDING',
             events: [],
-            playing: false,
             currentTime: 0,
             currentEvents: [],
         },
-        state:"STOPPED",
+        recordingGrid: {
+            mode: 'NOT_RECORDING',
+            events: [],
+            currentTime: 0,
+            currentEvents: [],
+        },
         recordingOn: false,
+        absTime:0
     }
     scheduledEvents = [];
 
     getRecordingEndTime = () => {
-        if (this.state.recording.events.length === 0) {
+        const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+        if (joinedEvents.length === 0) {
             return 0;
         }
         return Math.max(
-            ...this.state.recording.events.map(event => event.time + event.duration),
+            ...joinedEvents.map(event => event.time + event.duration),
         );
     };
 
     setRecording = value => {
         this.setState({
-            recording: Object.assign({}, this.state.recording, value),
+            recordingPiano: Object.assign({}, this.state.recordingPiano, value),
+        });
+    };
+    setRecordingGrid = value => {
+        this.setState({
+            recordingGrid: Object.assign({}, this.state.recordingGrid, value),
         });
     };
 
     onClickPlay = () => {
-        if(this.state.playing)
-        return
-       this.setState({
-           playing:true
-       })
         this.setRecording({
             mode: 'PLAYING',
-            state: "PLAYING",
         });
+        this.setRecordingGrid({
+            mode:"PLAYING"
+        })
         this.setState({ recordingOn: false })
+        const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+
+
         const startAndEndTimes = _.uniq(
-            _.flatMap(this.state.recording.events, event => [
+            _.flatMap(joinedEvents, event => [
                 event.time,
                 event.time + event.duration,
             ]),
         );
-
         startAndEndTimes.forEach((time, i) => {
             this.scheduledEvents.push(
                 setTimeout(() => {
-                    const currentEvents = this.state.recording.events.filter(event => {
+                    const currentEvents = joinedEvents.filter(event => {
                         return event.time <= time && event.time + event.duration > time
                     });
                     this.setRecording({
@@ -68,6 +78,7 @@ class PianoControllerProvider extends React.Component {
                 }, time * 1000),
             );
         });
+
         // Stop at the end
         setTimeout(() => {
             this.onFinish();
@@ -80,12 +91,15 @@ class PianoControllerProvider extends React.Component {
         });
         this.setRecording({
             mode: "NOT_RECORDING",
-            state: "STOPPED",
             currentEvents: [],
         });
-        this.setState({
-            playing:false
-        })
+        this.setRecordingGrid({
+            mode: "NOT_PLAYING",
+            currentEvents: [],
+        });
+        // this.setState({
+        //     playing:false
+        // })
         this.setState({ recordingOn: false })
     };
     onFinish = () => {
@@ -94,12 +108,13 @@ class PianoControllerProvider extends React.Component {
         });
         this.setRecording({
             mode: "NOT_RECORDING",
-            state:"PLAYING",
             currentEvents: [],
         });
-        this.setState({
-            playing:false
-        })
+        this.setRecordingGrid({
+            mode: "NOT_PLAYING",
+            currentEvents: [],
+        });
+
         this.setState({ recordingOn: false })
     }
     onClickClear = () => {
@@ -107,19 +122,23 @@ class PianoControllerProvider extends React.Component {
         this.setRecording({
             mode: "NOT_RECORDING",
             events: [],
-            state: "STOPPED",
             currentEvents: [],
+            currentTime: 0,
+        });
+        this.setRecordingGrid({
+            mode: "NOT_PLAYING",
+            events: [],
             currentTime: 0,
         });
         this.setState({ recordingOn: false })
     };
 
     onClickUndo = () => {
-        if (this.state.recording.events.length === 0) {
+        if (this.state.recordingPiano.events.length === 0) {
             return
         }
-        const eventsLength = this.state.recording.events.length
-        const newEvents=this.state.recording.events.slice(0, eventsLength - 1)
+        const eventsLength = this.state.recordingPiano.events.length
+        const newEvents=this.state.recordingPiano.events.slice(0, eventsLength - 1)
         this.setRecording({
             mode: "NOT_RECORDING",
             events: newEvents,
@@ -131,7 +150,7 @@ class PianoControllerProvider extends React.Component {
     }
     onClickSave = () => {
         const instrumentIndex = this.props.instrumentList.findIndex(i => i === this.state.instrumentName)
-        saveMidi(this.state.recording.events, instrumentIndex)
+        saveMidi(this.state.recordingPiano.events, instrumentIndex)
     }
     onChangeFirstNote = (event) => {
         this.setState({
@@ -171,12 +190,14 @@ class PianoControllerProvider extends React.Component {
         }
         this.setState({
             recordingOn: checked,
-            paused: true
+            paused: true,
+            absTime:Date.now()
         })
     }
 
     render() {
         const propsToPass = {
+            absTime:this.state.absTime,
             toggleRecording: this.toggleRecording,
             onChangeInstrument: this.onChangeInstrument,
             onChangeFirstNote: this.onChangeFirstNote,
@@ -188,8 +209,10 @@ class PianoControllerProvider extends React.Component {
             onClickUndo: this.onClickUndo,
             noteRange: this.state.noteRange,
             recordingOn: this.state.recordingOn,
-            recording: this.state.recording,
+            recording: this.state.recordingPiano,
+            recordingGrid: this.state.recordingGrid,
             setRecording: this.setRecording,
+            setRecordingGrid: this.setRecordingGrid,
             instrumentName: this.state.instrumentName,
             instrumentList: this.props.instrumentList
         }

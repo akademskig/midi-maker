@@ -27,13 +27,15 @@ class AppPiano extends React.Component {
     absTime = 0
     prevStopped = false
     started = false
-    state={
-        pianoHeight:this.props.height/3+"px"}
+    state = {
+        pianoHeight: this.props.height / 3 + "px",
+        absTime: 0
+    }
     onPlayNoteInput = midiNumber => {
         if (this.prevNote === midiNumber && !this.prevStopped)
             return
         if (this.props.recording.currentTime === 0 && !this.started) {
-            this.setState({ absTime: Date.now() })
+            this.setState({ absTime: this.props.absTime })
             this.started = true
         }
         const startTime = Date.now()
@@ -81,6 +83,7 @@ class AppPiano extends React.Component {
                 duration: duration / 1000,
             };
         });
+
         this.props.setRecording({
             events: this.props.recording.events.concat(newEvents),
             currentTime: (Date.now() + duration - this.state.absTime) / 1000,
@@ -89,13 +92,13 @@ class AppPiano extends React.Component {
 
     componentWillReceiveProps = (curr) => {
         if (curr.recordingOn && !this.props.recordingOn) {
-            const elapsed = Date.now() - (this.props.recording.currentTime * 1000 + this.absTime)
-            this.setState({ absTime: elapsed + this.absTime })
+            const elapsed = Date.now() - (this.props.recording.currentTime * 1000 + this.state.absTime)
+            this.setState({ absTime: elapsed + this.state.absTime })
         }
-        if(this.props.height!==curr.height)
-        this.setState({
-            pianoHeight: curr.height/3+"px"
-        })
+        if (this.props.height !== curr.height)
+            this.setState({
+                pianoHeight: curr.height / 3 + "px"
+            })
     }
 
     render() {
@@ -125,7 +128,7 @@ class AppPiano extends React.Component {
                     // audioContext={audioContext}
                     // hostname={soundfontHostname}
                     render={({ isLoading, playNote, stopNote }) => (
-                        <div className={classes.piano} style={{height:window.innerHeight/4}}>
+                        <div className={classes.piano} style={{ height: window.innerHeight / 4 }}>
                             {isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
                             <Piano
 
