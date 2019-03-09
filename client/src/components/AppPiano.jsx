@@ -120,7 +120,7 @@ class AppPiano extends React.Component {
         });
         const { mode, currentEvents } = recording;
         const activeNotes =
-            mode === 'PLAYING' ? currentEvents.map(event => event.midiNumber) : null;
+            mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
         return (
             <div>
                 < SoundfontProvider

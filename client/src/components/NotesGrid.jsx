@@ -25,6 +25,7 @@ class NotesGrid extends React.Component {
                             playNote={playNote}
                             stopNote={stopNote}
                             loading={isLoading}
+                            onClickPlay={this.props.onClickPlay}
                             canvasContainer={canvasContainer}
                             setRecording={this.props.setRecording}
                             recordingGrid={this.props.recordingGrid}
@@ -155,6 +156,7 @@ class Canvas extends React.Component {
         window.setTimeout(() => this.stop(), this.maxTime * 1000)
     }
     showRecordingBar = () => {
+        this.props.onClickPlay()
         const timesRemained = []
         const canvas = this.refs.canvas
         for (let i = 0; i < REC_TIME; i += 0.1) {
