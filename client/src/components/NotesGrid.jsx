@@ -4,7 +4,6 @@ import Dimensions from 'react-dimensions';
 import _ from "lodash"
 import SoundfontProvider from "../providers/SoundFontProvider";
 import { CircularProgress } from "@material-ui/core";
-import { element } from "prop-types";
 class NotesGrid extends React.Component {
     render() {
         const notes = []
@@ -48,10 +47,11 @@ const RECT_COLOR = "rgba(4,32,55,1)"
 const FIRST_RECT_COLOR = "rgb(255,255,255)"
 const NOTE_COLOR = "#61dafb"
 const START_TIME = window.innerWidth / (RECT_WIDTH + RECT_SPACE)
-const RECT_TIME = 5
+const RECT_TIME = 2
 const BAR_COLOR = "#d13a1f"
 const RECORDING_BAR_COLOR = "#a0cf33"
 const BAR_WIDTH = 4
+const REC_TIME = 180
 class Canvas extends React.Component {
     coordsMap = []
     eventsRect = []
@@ -62,15 +62,26 @@ class Canvas extends React.Component {
     lastRect = null
     timers = []
     recordingTimers = []
-    state = { playing: false }
-    totalTIme
-    maxTime=0
+    maxTime = 0
+    state = {
+        playing: false,
+        timesRemained: []
+    }
+    timer
+
     drawInitial = (canvas, timer) => {
-        const joinedEvents=this.props.recordingGrid.events.concat(this.props.recording.events)
-        this.maxTime=Math.max(this.props.recording.currentTime, this.props.recordingGrid.currentTime)
-        const time=this.props.recordingGrid.currentTime>this.props.recording.currentTime?this.props.recordingGrid.currentTime:this.props.recording.currentTime
-        let xLength = (time * RECT_TIME) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : time * RECT_TIME + 5
-        this.totalTime=xLength
+
+        const joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
+        this.maxTime = Math.max(this.props.recording.currentTime, this.props.recordingGrid.currentTime)
+        if (this.props.recording.mode === "PLAYING")
+            this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
+            this.maxTime=this.time
+        if (this.props.recording.mode === "RECORDING" && timer)
+            this.time = timer
+        else if (!this.time)
+            this.time = REC_TIME
+        let xLength = (this.time * RECT_TIME) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.time * RECT_TIME + 5
+
         let c = canvas.getContext("2d")
         canvas.width = (xLength * (RECT_WIDTH + RECT_SPACE))
         this.canvasWidth = canvas.width
@@ -103,10 +114,7 @@ class Canvas extends React.Component {
                 c.fillStyle = NOTE_COLOR
                 c.clearRect(x, y, width, RECT_HEIGHT);
                 c.fillRect(x, y, width, RECT_HEIGHT);
-                if (i === joinedEvents.length - 1)
-                    if (x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
-                        this.props.canvasContainer.scroll(x, y)
-                    }
+
             });
         }
         this.eventsRect.forEach(eventRect => {
@@ -115,27 +123,29 @@ class Canvas extends React.Component {
             c.fillRect(eventRect.x, eventRect.y, RECT_WIDTH, RECT_HEIGHT);
         })
         if (timer) {
-            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst + RECT_WIDTH / 2
-            c.fillStyle = this.props.recording.mode==="RECORDING"?RECORDING_BAR_COLOR : BAR_COLOR
+            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst
+            c.fillStyle = this.props.recording.mode === "RECORDING" ? RECORDING_BAR_COLOR : BAR_COLOR
+            c.fillStyle = this.props.recording.mode === "PLAYING" ? BAR_COLOR : RECORDING_BAR_COLOR
             c.fillRect(x, 0, BAR_WIDTH, canvas.height)
             this.lastRect = x
             if (x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
-                const y = 30;
-                this.props.canvasContainer.scroll(x, y)
+                const y = 300;
+                this.props.canvasContainer.scroll(x + 100, y)
             }
         }
         if (this.lastRect && !timer) {
-            c.fillStyle =this.props.recording.mode==="RECORDING"?RECORDING_BAR_COLOR : BAR_COLOR
+            c.fillStyle = this.props.recording.mode === "RECORDING" ? RECORDING_BAR_COLOR : BAR_COLOR
+            c.fillStyle = this.props.recording.mode === "PLAYING" ? BAR_COLOR : RECORDING_BAR_COLOR
             c.fillRect(this.lastRect, 0, BAR_WIDTH, canvas.height)
         }
     }
 
     play = () => {
-        if (this.props.recordingGrid.mode==="PLAYING")
+        if (this.props.recordingGrid.mode === "PLAYING")
             return
 
         const canvas = this.refs.canvas
-        for (let i = 0; i < this.maxTime; i += (1 / RECT_TIME)) {
+        for (let i = 0; i < this.maxTime; i += 0.1) {
             let t = window.setTimeout(() => {
                 let count = i
                 this.drawInitial(canvas, count)
@@ -145,24 +155,53 @@ class Canvas extends React.Component {
         window.setTimeout(() => this.stop(), this.maxTime * 1000)
     }
     showRecordingBar = () => {
+        const timesRemained = []
         const canvas = this.refs.canvas
-        for (let i = 0; i < this.totalTime; i += (1 / RECT_TIME)) {
+        for (let i = 0; i < REC_TIME; i += 0.1) {
+            timesRemained.push(i)
             let t = window.setTimeout(() => {
-                let count = i
-                this.drawInitial(canvas, count)
-            }, Math.ceil(i * 1000))
+                this.drawInitial(canvas, i)
+            }, Math.floor(i * 1000))
             this.recordingTimers.push(t)
         }
-        window.setTimeout(() => this.props.recordingGrid.currentTime * 1000)
+        this.setState({ timesRemained })
     }
 
     stop = () => {
         this.timers.forEach(t => clearTimeout(t))
         this.lastRect = null
     }
-    stopRecordingBar = () => {
+    stopRecordingBar = (pause) => {
+        const canvas = this.refs.canvas
         this.recordingTimers.forEach(t => clearTimeout(t))
-        this.lastRect = null
+        if (!pause)
+            this.lastRect = null
+        this.setState({ absTime: this.props.absTime })
+        this.drawInitial(canvas, this.props.recording.currentTime)
+    }
+
+    resetRec = () => {
+        this.setState({
+            timesRemained: []
+        })
+    }
+    resumeRec = () => {
+        const canvas = this.refs.canvas
+        const tr = this.state.timesRemained
+        let start = null
+        for (let i = 0; i < tr.length; i++) {
+            if (tr[i] < this.props.recording.currentTime)
+                continue
+            if (!start)
+                start = tr[i]
+            let t = window.setTimeout(() => {
+                this.drawInitial(canvas, tr[i])
+
+            }, Math.floor((tr[i] - start) * 1000))
+            this.recordingTimers.push(t)
+        }
+        window.setTimeout(() => this.totalTime * 1000)
+
     }
     showCoords = (event) => {
         var x = event.clientX + this.props.canvasContainer.scrollLeft
@@ -173,7 +212,7 @@ class Canvas extends React.Component {
         if (!rect)
             return
         if (rect.x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
-            this.props.canvasContainer.scroll(rect.x, rect.y)
+            this.props.canvasContainer.scroll(rect.x + 100, rect.y)
         }
 
         const lastEvent = {
@@ -221,10 +260,21 @@ class Canvas extends React.Component {
             this.play()
         if (this.props.recordingGrid.mode === "PLAYING" && newProps.recordingGrid.mode === "NOT_PLAYING")
             this.stop()
-            if(this.props.recording.mode!="RECORDING"&& newProps.recording.mode==="RECORDING")
+        if (this.props.recording.mode !== "RECORDING" && newProps.recording.mode === "RECORDING" && newProps.recording.reset) {
             this.showRecordingBar()
-            if(this.props.recording.mode==="RECORDING"&& newProps.recording.mode!=="RECORDING")
-            this.stopRecordingBar()
+            this.props.setRecording({
+                reset: false
+            })
+        }
+        if (this.props.recording.mode !== "RECORDING" && newProps.recording.mode === "RECORDING" && !newProps.recording.reset)
+            this.resumeRec()
+        if (this.props.recording.mode === "RECORDING" && newProps.recording.mode !== "RECORDING") {
+            this.stopRecordingBar(true);
+        }
+        if (!this.props.recording.reset && newProps.recording.reset) {
+            this.stopRecordingBar(false); this.resetRec()
+
+        }
 
     }
     componentDidUpdate() {

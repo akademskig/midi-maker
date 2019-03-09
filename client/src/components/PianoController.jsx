@@ -45,13 +45,15 @@ class PianoController extends Component {
             recordingOn,
             onChangeInstrument,
             recording,
+            onClickReset,
+            onClickAddChannel,
             noteRange } = this.props;
         const midiNumbersToNotes = MidiNumbers.NATURAL_MIDI_NUMBERS.reduce((obj, midiNumber) => {
             obj[midiNumber] = MidiNumbers.getAttributes(midiNumber).note;
             return obj;
         }, {});
         return (
-            <div className={classes.backgroundDiv}>
+            <div>
                 <Grid container spacing={24} className={classes.controllerGrid}>
                     <Grid item xs={6}>
                         <Paper className={classes.controlPaper}>
@@ -117,10 +119,12 @@ class PianoController extends Component {
                                 <Button onClick={onClickClear}>Clear</Button>
                                 <Button onClick={onClickUndo}>Undo</Button>
                                 <Button onClick={onClickSave}>Save</Button>
+                                <Button onClick={onClickAddChannel}>Add Channel</Button>
+                                <Button onClick={onClickReset}>Reset</Button>
                             </div>
                             <div className="mt-5">
-                                <strong>Recorded notes</strong>
-                                <div>{JSON.stringify(recording)}</div>
+                                {/* <strong>Recorded notes</strong>
+                                <div>{JSON.stringify(recording)}</div> */}
                             </div>
                         </Paper>
                     </Grid>

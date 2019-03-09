@@ -13,6 +13,7 @@ class PianoControllerProvider extends React.Component {
         instrumentName: "acoustic_grand_piano",
         recordingPiano: {
             mode: 'NOT_RECORDING',
+            reset:true,
             events: [],
             currentTime: 0,
             currentEvents: [],
@@ -122,6 +123,7 @@ class PianoControllerProvider extends React.Component {
         this.setRecording({
             mode: "NOT_RECORDING",
             events: [],
+            reset:true,
             currentEvents: [],
             currentTime: 0,
         });
@@ -145,7 +147,7 @@ class PianoControllerProvider extends React.Component {
             currentTime: newEvents[newEvents.length - 1].time +newEvents[newEvents.length - 1].duration
         })
         this.setState({
-            recordingOn: false
+            recordingOn: false,
         })
     }
     onClickSave = () => {
@@ -177,11 +179,22 @@ class PianoControllerProvider extends React.Component {
     onClickAddChannel = () => {
 
     }
+
+    onClickReset=()=>{
+        this.setRecording({
+            reset:true
+        })
+    }
     toggleRecording = (event, checked) => {
         if (checked) {
             this.setRecording({
                 mode: 'RECORDING',
             });
+
+            if(this.state.recordingPiano.events.length===0)
+            this.setState({
+                absTime:Date.now()
+            })
         }
         else {
             this.setRecording({
@@ -190,8 +203,7 @@ class PianoControllerProvider extends React.Component {
         }
         this.setState({
             recordingOn: checked,
-            paused: true,
-            absTime:Date.now()
+            paused: true
         })
     }
 
