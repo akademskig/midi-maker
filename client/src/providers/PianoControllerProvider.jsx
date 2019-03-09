@@ -57,10 +57,7 @@ class PianoControllerProvider extends React.Component {
         this.setRecordingGrid({
             mode:"PLAYING"
         })
-        this.setState({ recordingOn: false })
         const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
-
-
         const startAndEndTimes = _.uniq(
             _.flatMap(joinedEvents, event => [
                 event.time,
