@@ -13,7 +13,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer" style={{
-                height: window.innerHeight / 2 - 30, bottom: window.innerHeight / 4
+                height: window.innerHeight / 2 - 20, bottom: window.innerHeight / 4
             }}>
                 < SoundfontProvider
                     instrumentName={this.props.instrumentName || "acoustic_grand_piano"}
@@ -76,7 +76,7 @@ class Canvas extends React.Component {
         this.maxTime = Math.max(this.props.recording.currentTime, this.props.recordingGrid.currentTime)
         if (this.props.recording.mode === "PLAYING")
             this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
-            this.maxTime=this.time
+        this.maxTime = this.time
         if (this.props.recording.mode === "RECORDING" && timer)
             this.time = timer
         else if (!this.time)
@@ -207,7 +207,7 @@ class Canvas extends React.Component {
     }
     showCoords = (event) => {
         var x = event.clientX + this.props.canvasContainer.scrollLeft
-        var y = event.clientY - 240;
+        var y = event.clientY - (this.props.canvasContainer.getBoundingClientRect().top);
         const rect = this.coordsMap.find(i =>
             (x >= i.x && x <= (i.x + RECT_WIDTH)) && (y >= i.y && y <= (i.y + RECT_HEIGHT))
         )
@@ -275,9 +275,7 @@ class Canvas extends React.Component {
         }
         if (!this.props.recording.reset && newProps.recording.reset) {
             this.stopRecordingBar(false); this.resetRec()
-
         }
-
     }
     componentDidUpdate() {
         const canvas = this.refs.canvas
