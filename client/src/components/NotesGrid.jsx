@@ -72,10 +72,10 @@ class Canvas extends React.Component {
 
     drawInitial = (canvas, timer) => {
         const joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
-        if (this.props.recording.mode === "PLAYING") {
-            this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
-            this.maxTime = this.time
-        }
+
+        this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
+        this.maxTime = this.time
+
         if (this.props.recording.mode === "RECORDING" && timer)
             this.time = timer
         else if (!this.time)
@@ -143,7 +143,6 @@ class Canvas extends React.Component {
     play = () => {
         if (this.props.recordingGrid.mode === "PLAYING")
             return
-
         const canvas = this.refs.canvas
         for (let i = 0; i < this.maxTime; i += 0.1) {
             let t = window.setTimeout(() => {
