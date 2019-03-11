@@ -13,7 +13,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer" style={{
-                height: window.innerHeight / 2 - 20, bottom: window.innerHeight / 4
+                height: window.innerHeight / 2 - 30, bottom: window.innerHeight / 5
             }}>
                 < SoundfontProvider
                     instrumentName={this.props.instrumentName || "acoustic_grand_piano"}
@@ -71,16 +71,15 @@ class Canvas extends React.Component {
     timer
 
     drawInitial = (canvas, timer) => {
-
         const joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
-        this.maxTime = Math.max(this.props.recording.currentTime, this.props.recordingGrid.currentTime)
-        if (this.props.recording.mode === "PLAYING")
+        if (this.props.recording.mode === "PLAYING") {
             this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
-        this.maxTime = this.time
+            this.maxTime = this.time
+        }
         if (this.props.recording.mode === "RECORDING" && timer)
             this.time = timer
         else if (!this.time)
-            this.time = REC_TIME
+            this.time = 4
         let xLength = (this.time * RECT_TIME) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.time * RECT_TIME + 5
 
         let c = canvas.getContext("2d")

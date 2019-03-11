@@ -12,8 +12,7 @@ const styles = theme => ({
         position: "fixed",
         bottom: 0,
         left: 0,
-        right: 0,
-
+        right: 0
     }
 });
 class AppPiano extends React.Component {
@@ -28,7 +27,7 @@ class AppPiano extends React.Component {
     prevStopped = false
     started = false
     state = {
-        pianoHeight: this.props.height / 3 + "px",
+        pianoHeight: this.props.height / 4 + "px",
         absTime: 0
     }
     onPlayNoteInput = midiNumber => {
@@ -128,7 +127,7 @@ class AppPiano extends React.Component {
                     // audioContext={audioContext}
                     // hostname={soundfontHostname}
                     render={({ isLoading, playNote, stopNote }) => (
-                        <div className={classes.piano} style={{ height: window.innerHeight / 4 }}>
+                        <div className={classes.piano} style={{ height: window.innerHeight / 5 }}>
                             {isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
                             <Piano
 
