@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Soundfont from 'soundfont-player';
+import _ from "lodash"
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const hostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 class SoundfontProvider extends React.Component {
@@ -20,6 +21,7 @@ class SoundfontProvider extends React.Component {
         soundfont: 'MusyngKite',
         instrumentName: 'acoustic_grand_piano',
     };
+    instruments=[]
 
     constructor(props) {
         super(props);
@@ -38,13 +40,14 @@ class SoundfontProvider extends React.Component {
             this.loadInstrument(this.props.instrumentName);
         }
     }
-
+    setInstrument(instrument) {
+        this.instrument = instrument
+    }
     loadInstrument = instrumentName => {
-        // Re-trigger loading state
         this.setState({
             instrument: null,
         });
-        Soundfont.instrument(audioContext, instrumentName, {
+        return Soundfont.instrument(audioContext, instrumentName, {
             format: this.props.format,
             soundfont: this.props.soundfont,
             nameToUrl: (name, soundfont, format) => {
@@ -54,12 +57,72 @@ class SoundfontProvider extends React.Component {
             this.setState({
                 instrument,
             });
+            return instrument
+        });
+    };
+    loadChannelInstrument = (instrumentName) => {
+
+        return Soundfont.instrument(audioContext, instrumentName, {
+            format: this.props.format,
+            soundfont: this.props.soundfont,
+            nameToUrl: (name, soundfont, format) => {
+                return `${hostname}/${soundfont}/${name}-${format}.js`;
+            },
+        }).then(instrument => {
+            this.instruments[instrumentName] = instrument
+            return instrument
         });
     };
 
-    playNote = midiNumber => {
+
+   playAll  = async (channels)=>       {
+    //    console.log(channels)
+    //     await this.channelsToPlaylist(channels)
+        let joinedEvents = []
+
+        if (channels.length > 0) {
+            channels.map(c => {
+                const notes= c.notes.map(n => {
+                    return Object.assign({},n, {instrumentName: c.instrumentName})
+                })
+                joinedEvents = joinedEvents.concat(notes)
+            })
+        }
+        const startAndEndTimes = _.uniq(
+            _.flatMap(joinedEvents, event => [
+                event.time,
+                event.time + event.duration,
+            ]),
+        );
+        const scheduledEvents = []
+        startAndEndTimes.forEach((time, i) => {
+            scheduledEvents.push(
+                setTimeout(() => {
+                    const currentEvents = joinedEvents.filter(event => {
+                        return event.time <= time && event.time + event.duration > time
+                    });
+                    currentEvents.forEach(ce => {
+                        this.play(ce.midiNumber, ce.duration, ce.instrumentName)
+                    })
+                }, time * 1000),
+            );
+        });
+    }
+    channelsToPlaylist = async (channels) => {
+        channels.forEach(async c => {
+            this.instruments[c.instrumentName] = await this.loadChannelInstrument(c.instrumentName)
+        })
+
+    }
+    play = (midiNumber, duration, instrumentName) => {
+        this.playNote(midiNumber, instrumentName)
+        window.setTimeout(() => {
+            this.stopNote(midiNumber)
+        }, duration * 1000)
+    }
+    playNote = (midiNumber, instrumentName) => {
         audioContext.resume().then(() => {
-            const audioNode = this.state.instrument.play(midiNumber);
+            const audioNode = instrumentName ? this.instruments[instrumentName].play(midiNumber) : this.state.instrument.play(midiNumber);
             this.setState({
                 activeAudioNodes: Object.assign({}, this.state.activeAudioNodes, {
                     [midiNumber]: audioNode,
@@ -99,12 +162,28 @@ class SoundfontProvider extends React.Component {
     };
 
     render() {
-        return this.props.render({
+        const props = {
             isLoading: !this.state.instrument,
             playNote: this.playNote,
             stopNote: this.stopNote,
+            playAll: this.playAll,
+            loadInstrument: this.loadInstrument,
             stopAllNotes: this.stopAllNotes,
-        });
+            loadChannelInstrument: this.loadChannelInstrument
+        }
+        return (
+            React.Children.map(this.props.children, (child) => {
+                return React.cloneElement(child, { ...props });
+            })
+        )
+        // return this.props.render({
+        //     isLoading: !this.state.instrument,
+        //     playNote: this.playNote,
+        //     stopNote: this.stopNote,
+        //     playAll: this.playAll,
+        //     setInstrument: this.setInstrument,
+        //     stopAllNotes: this.stopAllNotes,
+        // });
     }
 }
 

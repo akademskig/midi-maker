@@ -6,6 +6,7 @@ import 'react-piano/dist/styles.css';
 import PianoController from "../components/PianoController";
 import PianoControllerProvider from "../providers/PianoControllerProvider";
 import NotesGrid  from "../components/NotesGrid";
+import SoundfontProvider from "../providers/SoundFontProvider";
 
 const styles = theme => ({
     root: {
@@ -26,11 +27,13 @@ class NewMidi extends Component {
     render() {
         return (
             <div >
+                <SoundfontProvider>
                 <PianoControllerProvider>
                     <PianoController ></PianoController>
                     <NotesGrid></NotesGrid>
                     <AppPiano ></AppPiano>
                 </PianoControllerProvider>
+                </SoundfontProvider>
             </div>
         )
     }

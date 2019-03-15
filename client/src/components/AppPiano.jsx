@@ -1,11 +1,8 @@
 import React from "react"
 import { Piano, KeyboardShortcuts } from 'react-piano';
-import SoundfontProvider from "../providers/SoundFontProvider";
 import PropTypes from "prop-types"
 import { LinearProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
-import Dimensions from '../providers/DimensionsProvider';
-import windowSize from 'react-window-size';
 
 const styles = theme => ({
     piano: {
@@ -103,15 +100,14 @@ class AppPiano extends React.Component {
     render() {
         const {
             classes,
-            playNote,
             stopNote,
             recording,
             setRecording,
             noteRange,
+            channels,
             instrumentName,
             ...pianoProps
         } = this.props;
-
         const keyboardShortcuts = KeyboardShortcuts.create({
             firstNote: noteRange.first,
             lastNote: noteRange.last,
@@ -121,29 +117,19 @@ class AppPiano extends React.Component {
         const activeNotes =
             mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
         return (
-            <div>
-                < SoundfontProvider
-                    instrumentName={instrumentName || "acoustic_grand_piano"}
-                    // audioContext={audioContext}
-                    // hostname={soundfontHostname}
-                    render={({ isLoading, playNote, stopNote }) => (
-                        <div className={classes.piano} style={{ height: window.innerHeight / 5 }}>
-                            {isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
-                            <Piano
+            <div className={classes.piano} style={{ height: window.innerHeight / 5 }}>
+                {this.props.isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
+                <Piano
+                    noteRange={noteRange}
+                    playNote={this.props.playNote}
+                    stopNote={stopNote}
+                    disabled={this.props.isLoading}
+                    keyboardShortcuts={keyboardShortcuts}
+                    onPlayNoteInput={this.onPlayNoteInput}
+                    onStopNoteInput={this.onStopNoteInput}
+                    activeNotes={activeNotes && activeNotes[0] ? activeNotes : null}
+                    {...pianoProps}
 
-                                noteRange={noteRange}
-                                playNote={playNote}
-                                stopNote={stopNote}
-                                disabled={isLoading}
-                                keyboardShortcuts={keyboardShortcuts}
-                                onPlayNoteInput={this.onPlayNoteInput}
-                                onStopNoteInput={this.onStopNoteInput}
-                                activeNotes={activeNotes && activeNotes[0] ? activeNotes : null}
-                                {...pianoProps}
-
-                            />
-                        </div>
-                    )}
                 />
             </div>
         );
