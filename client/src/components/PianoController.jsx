@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button } from "@material-ui/core";
+import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
-
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import AddChannelForm from "./AddChannelForm"
 const styles = theme => ({
     controllerGrid: {
-        marginBottom: "20px"
+        marginBottom: 0
     },
     controlPaper: {
         padding: theme.spacing.unit * 2,
@@ -29,6 +30,19 @@ const styles = theme => ({
 
 class PianoController extends Component {
 
+    state = {
+        newChannelModal: false
+    }
+    onSubmitNewChannel = (channel) => {
+        this.props.onSubmitNewChannel(channel)
+        this.setState({
+            newChannelModal: false
+        })
+    }
+    onClickAddChannel = () => {
+        this.setState({ newChannelModal: true })
+    }
+
     render() {
         const {
             classes,
@@ -46,7 +60,9 @@ class PianoController extends Component {
             onChangeInstrument,
             recording,
             onClickReset,
+            playAllChannels,
             onClickAddChannel,
+            channels,
             noteRange } = this.props;
         const midiNumbersToNotes = MidiNumbers.NATURAL_MIDI_NUMBERS.reduce((obj, midiNumber) => {
             obj[midiNumber] = MidiNumbers.getAttributes(midiNumber).note;
@@ -54,9 +70,9 @@ class PianoController extends Component {
         }, {});
         return (
             <div>
-                <Grid container spacing={24} className={classes.controllerGrid}>
-                    <Grid item xs={6}>
-                        <Paper className={classes.controlPaper}>
+                <Paper className={classes.controlPaper}>
+                    <Grid container spacing={24} className={classes.controllerGrid}>
+                        <Grid item xs={4}>
                             <form className={classes.root} >
                                 <FormControl className={classes.formControl}>
                                     <InputLabel htmlFor="first-note">Start Note</InputLabel>
@@ -98,11 +114,8 @@ class PianoController extends Component {
                                     </Select>
                                 </FormControl>
                             </form>
-                        </Paper>
-
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper className={classes.controlPaper}>
+                        </Grid>
+                        <Grid item xs={4}>
                             <FormControlLabel
                                 className={classes.formControl}
                                 label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
@@ -119,16 +132,24 @@ class PianoController extends Component {
                                 <Button onClick={onClickClear}>Clear</Button>
                                 <Button onClick={onClickUndo}>Undo</Button>
                                 <Button onClick={onClickSave}>Save</Button>
-                                <Button onClick={onClickAddChannel}>Add Channel</Button>
+                                <Button onClick={playAllChannels}>Play All</Button>
                                 <Button onClick={onClickReset}>Reset</Button>
                             </div>
                             <div className="mt-5">
                                 {/* <strong>Recorded notes</strong>
                                 <div>{JSON.stringify(recording)}</div> */}
                             </div>
-                        </Paper>
+
+                        </Grid>
+                        <Grid item xs={4}>
+                            <ChannelsList channels={channels}></ChannelsList>
+                            <Button onClick={this.onClickAddChannel}>Add Channel</Button>
+                            <Modal autoFocus={false}open={this.state.newChannelModal}>
+                                <AddChannelForm instrumentList={instrumentList} onSubmitNewChannel={this.onSubmitNewChannel}></AddChannelForm>
+                            </Modal>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Paper>
             </div>
         )
     }
@@ -152,3 +173,18 @@ PianoController.propTypes = {
     onChangeInstrument: PropTypes.func,
     noteRange: PropTypes.object
 }
+
+function ChannelsList(props) {
+    return (
+        <List>Channels
+            {props.channels.map((c, i) => (
+            <ListItem key={i}>
+                <ListItemText primary={c.name} />
+            </ListItem>
+        ))}
+
+        </List>
+    );
+}
+
+
