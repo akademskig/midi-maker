@@ -2,7 +2,6 @@ import React from "react";
 import { MidiNumbers } from 'react-piano';
 import Dimensions from 'react-dimensions';
 import _ from "lodash"
-import SoundfontProvider from "../providers/SoundFontProvider";
 import { CircularProgress } from "@material-ui/core";
 class NotesGrid extends React.Component {
     render() {
@@ -15,23 +14,23 @@ class NotesGrid extends React.Component {
             <div ref="canvasContainer" className="gridContainer" style={{
                 height: window.innerHeight / 2 - 30, bottom: window.innerHeight / 5
             }}>
-                < SoundfontProvider
-                    instrumentName={this.props.instrumentName || "acoustic_grand_piano"}
-                    render={({ isLoading, playNote, stopNote }) => (
-                        <Canvas
-                            midiOffset={this.props.noteRange.first}
-                            recording={this.props.recording}
-                            notes={notes}
-                            playNote={playNote}
-                            stopNote={stopNote}
-                            loading={isLoading}
-                            onClickPlay={this.props.onClickPlay}
-                            canvasContainer={canvasContainer}
-                            setRecording={this.props.setRecording}
-                            recordingGrid={this.props.recordingGrid}
-                            setRecordingGrid={this.props.setRecordingGrid}
-                        >
-                        </Canvas>)}></SoundfontProvider>
+
+                <Canvas
+                    midiOffset={this.props.noteRange.first}
+                    recording={this.props.recording}
+                    notes={notes}
+                    playNote={this.props.playNote}
+                    stopNote={this.props.stopNote}
+                    loading={this.props.isLoading}
+                    playAll={this.props.playAll}
+                    onClickPlay={this.props.onClickPlay}
+                    canvasContainer={canvasContainer}
+                    setRecording={this.props.setRecording}
+                    recordingGrid={this.props.recordingGrid}
+                    setRecordingGrid={this.props.setRecordingGrid}
+                    channels={this.props.channels}
+                >
+                </Canvas>)}>
             </div>
         )
     }
@@ -70,12 +69,18 @@ class Canvas extends React.Component {
     }
     timer
 
-    drawInitial = (canvas, timer) => {
-        const joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
+    drawInitial = (canvas, timer, playAll) => {
+        let joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
 
         this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
+        if (this.props.channels.length > 0) {
+            this.props.channels.forEach(c => {
+                joinedEvents = joinedEvents.concat(c.notes)
+                if (c.duration > this.time)
+                    this.time = c.duration
+            })
+        }
         this.maxTime = this.time
-
         if (this.props.recording.mode === "RECORDING" && timer)
             this.time = timer
         else if (!this.time)
@@ -126,6 +131,7 @@ class Canvas extends React.Component {
             const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst
             c.fillStyle = this.props.recording.mode === "RECORDING" ? RECORDING_BAR_COLOR : BAR_COLOR
             c.fillStyle = this.props.recording.mode === "PLAYING" ? BAR_COLOR : RECORDING_BAR_COLOR
+            c.clearRect(x, 0, BAR_WIDTH, canvas.height)
             c.fillRect(x, 0, BAR_WIDTH, canvas.height)
             this.lastRect = x
             if (x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
@@ -148,6 +154,20 @@ class Canvas extends React.Component {
             let t = window.setTimeout(() => {
                 let count = i
                 this.drawInitial(canvas, count)
+            }, Math.ceil(i * 1000))
+            this.timers.push(t)
+        }
+        window.setTimeout(() => this.stop(), this.maxTime * 1000)
+    }
+
+    playAll = () => {
+        if (this.props.recordingGrid.mode === "PLAYING_ALL")
+            return
+        const canvas = this.refs.canvas
+        for (let i = 0; i < this.maxTime; i += 0.1) {
+            let t = window.setTimeout(() => {
+                let count = i
+                this.drawInitial(canvas, count, true)
             }, Math.ceil(i * 1000))
             this.timers.push(t)
         }
@@ -260,6 +280,8 @@ class Canvas extends React.Component {
             this.play()
         if (this.props.recordingGrid.mode === "PLAYING" && newProps.recordingGrid.mode === "NOT_PLAYING")
             this.stop()
+        // if (newProps.recordingGrid.mode === "PLAYING_ALL" && this.props.recordingGrid.mode !== "PLAYING_ALL")
+        //     this.playAll()
         if (this.props.recording.mode !== "RECORDING" && newProps.recording.mode === "RECORDING" && newProps.recording.reset) {
             this.showRecordingBar()
             this.props.setRecording({

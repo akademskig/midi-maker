@@ -24,11 +24,30 @@ class PianoControllerProvider extends React.Component {
             currentTime: 0,
             currentEvents: [],
         },
+        channels:[],
         recordingOn: false,
         absTime:0
     }
     scheduledEvents = [];
 
+    getChannelsEndTime = () => {
+        let joinedEvents = []
+
+        if (this.state.channels.length > 0) {
+            this.state.channels.map(c => {
+                const notes= c.notes.map(n => {
+                    return Object.assign({},n, {instrumentName: c.instrumentName})
+                })
+                joinedEvents = joinedEvents.concat(notes)
+            })
+        }
+        if (joinedEvents.length === 0) {
+            return 0;
+        }
+        return Math.max(
+            ...joinedEvents.map(event => event.time + event.duration),
+        );
+    };
     getRecordingEndTime = () => {
         const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
         if (joinedEvents.length === 0) {
@@ -57,6 +76,7 @@ class PianoControllerProvider extends React.Component {
         this.setRecordingGrid({
             mode:"PLAYING"
         })
+
         const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
         const startAndEndTimes = _.uniq(
             _.flatMap(joinedEvents, event => [
@@ -82,6 +102,18 @@ class PianoControllerProvider extends React.Component {
             this.onFinish();
         }, this.getRecordingEndTime() * 1000);
     };
+    playAllChannels=()=>{
+        this.setRecording({
+            mode: 'PLAYING',
+        });
+        this.setRecordingGrid({
+            mode:"PLAYING"
+        })
+        this.props.playAll(this.state.channels)
+        setTimeout(() => {
+            this.onFinish();
+        }, this.getChannelsEndTime() * 1000);
+    }
 
     onClickStop = () => {
         this.scheduledEvents.forEach(scheduledEvent => {
@@ -172,14 +204,26 @@ class PianoControllerProvider extends React.Component {
         this.setState({
             instrumentName: event.target.value,
         });
-    };
-    onClickAddChannel = () => {
 
+        this.props.loadInstrument(event.target.value)
+    };
+
+    onSubmitNewChannel = (newChannel) => {
+        newChannel.notes=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+        newChannel.instrumentName=this.state.instrumentName
+        this.props.loadChannelInstrument(this.state.instrumentName)
+        newChannel.duration=Math.max(this.state.recordingPiano.currentTime,this.state.recordingGrid.currentTime)
+        const newChannelList = this.state.channels.concat(newChannel)
+
+        this.setState({
+            channels: newChannelList
+        })
+        this.onClickClear()
     }
 
-    onClickReset=()=>{
+    onClickReset = () => {
         this.setRecording({
-            reset:true
+            reset: true
         })
     }
     toggleRecording = (event, checked) => {
@@ -188,10 +232,10 @@ class PianoControllerProvider extends React.Component {
                 mode: 'RECORDING',
             });
 
-            if(this.state.recordingPiano.events.length===0)
-            this.setState({
-                absTime:Date.now()
-            })
+            if (this.state.recordingPiano.events.length === 0)
+                this.setState({
+                    absTime: Date.now()
+                })
         }
         else {
             this.setRecording({
@@ -223,11 +267,14 @@ class PianoControllerProvider extends React.Component {
             setRecording: this.setRecording,
             setRecordingGrid: this.setRecordingGrid,
             instrumentName: this.state.instrumentName,
-            instrumentList: this.props.instrumentList
+            instrumentList: this.props.instrumentList,
+            channels:this.state.channels,
+            playAllChannels:this.playAllChannels,
+            onSubmitNewChannel: this.onSubmitNewChannel,
         }
         return (
             React.Children.map(this.props.children, (child) => {
-                return React.cloneElement(child, { ...propsToPass });
+                return React.cloneElement(child, { ...propsToPass,...this.props });
             })
         )
     }
