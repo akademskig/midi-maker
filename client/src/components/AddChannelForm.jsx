@@ -1,11 +1,19 @@
 import { withStyles } from '@material-ui/core/styles';
-import React,{Component} from "react"
+import React, { Component } from "react"
 import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent, TextField } from "@material-ui/core";
 const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
-        minWidth: 120,
+        textAlign: "center"
+
     },
+    addChannelPaper: {
+        margin: "auto",
+        maxWidth: "300px",
+        marginTop: "200px",
+        minWidth: "120px",
+        padding: "10px"
+    }
 });
 class AddChannelForm extends Component {
     state = {
@@ -28,55 +36,47 @@ class AddChannelForm extends Component {
         const channel = new Channel(this.state.channelName, this.state.instrument)
         this.props.onSubmitNewChannel(channel)
     }
+    onCancel = () => {
+        this.props.onCancel()
+    }
+    validateChannel = (text) => {
+        return !text.length > 0
+    }
     render() {
-        const{ classes}= this.props
+        const { classes } = this.props
         return (
             <DialogContent>
-            <Paper className="addChannelPaper">
-                {/* <FormControl className={classes.formControl}>
-                    <InputLabel>Instrument</InputLabel>
-                    <Select
-                        onChange={this.onInstrumentChange}
-                        value={this.state.instrument}>
-                        {this.props.instrumentList && this.props.instrumentList.map((value) => (
-                            <MenuItem value={value} key={value}>
-                                {value}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl> */}
-                <FormControl   required className={classes.formControl}>
-
-                    <TextField
-                    label="Name"
-                   variant="outlined"
-                    required
-                    autoFocus
-                        onChange={this.onChannelNameChange}
-                        value={this.state.channelName}
-
+                <Paper className={classes.addChannelPaper}>
+                    <form required={true} className={classes.formControl}
+                        onSubmit={this.onSubmitNewChannel}
+                    >
+                        <TextField className={classes.textField}
+                            error={this.validateChannel(this.state.channelName) ? true : false}
+                            label="Name"
+                            variant="outlined"
+                            required
+                            defaultValue="channel-0"
+                            autoFocus
+                            onChange={this.onChannelNameChange}
+                            value={this.state.channelName}
                         >
-
-                    </TextField>
-                    <Button onClick={this.onSubmitNewChannel}>OK</Button>
-                </FormControl>
-                <div className="mt-5">
-
-
-                </div>
-            </Paper>
+                        </TextField>
+                        <Button type="submit">OK</Button>
+                        <Button onClick={this.onCancel}>Cancel</Button>
+                    </form>
+                </Paper>
             </DialogContent>
         )
     }
 }
-export default  withStyles(styles)(AddChannelForm)
+export default withStyles(styles)(AddChannelForm)
 
 class Channel {
     name = ""
     instrument = ""
     notes = []
-    duration=0
-    instrumentName=""
+    duration = 0
+    instrumentName = ""
     constructor(name) {
         this.name = name
     }

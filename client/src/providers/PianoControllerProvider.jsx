@@ -248,6 +248,8 @@ class PianoControllerProvider extends React.Component {
         })
     }
 
+
+
     render() {
         const propsToPass = {
             absTime:this.state.absTime,
@@ -271,6 +273,7 @@ class PianoControllerProvider extends React.Component {
             channels:this.state.channels,
             playAllChannels:this.playAllChannels,
             onSubmitNewChannel: this.onSubmitNewChannel,
+            onCancel: this.onCancel
         }
         return (
             React.Children.map(this.props.children, (child) => {

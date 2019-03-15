@@ -42,7 +42,11 @@ class PianoController extends Component {
     onClickAddChannel = () => {
         this.setState({ newChannelModal: true })
     }
-
+    onCancel = () => {
+        this.setState({
+            newChannelModal: false
+        })
+    }
     render() {
         const {
             classes,
@@ -144,8 +148,14 @@ class PianoController extends Component {
                         <Grid item xs={4}>
                             <ChannelsList channels={channels}></ChannelsList>
                             <Button onClick={this.onClickAddChannel}>Add Channel</Button>
-                            <Modal autoFocus={false}open={this.state.newChannelModal}>
-                                <AddChannelForm instrumentList={instrumentList} onSubmitNewChannel={this.onSubmitNewChannel}></AddChannelForm>
+                            <Modal autoFocus={false} open={this.state.newChannelModal}>
+                                <AddChannelForm
+                                    instrumentList={instrumentList}
+                                    onSubmitNewChannel={this.onSubmitNewChannel}
+                                    onCancel={this.onCancel}
+                                >
+
+                                </AddChannelForm>
                             </Modal>
                         </Grid>
                     </Grid>
