@@ -3,13 +3,15 @@ import { Piano, KeyboardShortcuts } from 'react-piano';
 import PropTypes from "prop-types"
 import { LinearProgress } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
+import Dimensions from "../providers/DimensionsProvider";
 
 const styles = theme => ({
     piano: {
         position: "fixed",
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
+        height: window.innerHeight / 5 + "px"
     }
 });
 class AppPiano extends React.Component {
@@ -24,7 +26,7 @@ class AppPiano extends React.Component {
     prevStopped = false
     started = false
     state = {
-        pianoHeight: this.props.height / 4 + "px",
+        pianoHeight: this.props.height / 5 + "px",
         absTime: 0
     }
     onPlayNoteInput = midiNumber => {
@@ -99,6 +101,7 @@ class AppPiano extends React.Component {
 
     render() {
         const {
+            height,
             classes,
             stopNote,
             recording,
@@ -117,7 +120,7 @@ class AppPiano extends React.Component {
         const activeNotes =
             mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
         return (
-            <div className={classes.piano} style={{ height: window.innerHeight / 5 }}>
+            <div className={classes.piano} style={{ height: height / 5 + "px" }} >
                 {this.props.isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
                 <Piano
                     noteRange={noteRange}
@@ -128,7 +131,6 @@ class AppPiano extends React.Component {
                     onPlayNoteInput={this.onPlayNoteInput}
                     onStopNoteInput={this.onStopNoteInput}
                     activeNotes={activeNotes && activeNotes[0] ? activeNotes : null}
-                    {...pianoProps}
 
                 />
             </div>
@@ -141,4 +143,4 @@ AppPiano.propTypes = {
     lastNote: PropTypes.string,
     instrumentName: PropTypes.string
 }
-export default withStyles(styles)(AppPiano)
+export default withStyles(styles)(Dimensions(AppPiano))

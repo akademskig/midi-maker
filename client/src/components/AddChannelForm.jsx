@@ -1,6 +1,6 @@
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent, TextField } from "@material-ui/core";
+import { Paper, Button, DialogContent, TextField } from "@material-ui/core";
 const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
@@ -13,6 +13,9 @@ const styles = theme => ({
         marginTop: "200px",
         minWidth: "120px",
         padding: "10px"
+    },
+    button: {
+        margin: "10px"
     }
 });
 class AddChannelForm extends Component {
@@ -55,14 +58,14 @@ class AddChannelForm extends Component {
                             label="Name"
                             variant="outlined"
                             required
-                            defaultValue="channel-0"
+                            placeholder="channel-0"
                             autoFocus
                             onChange={this.onChannelNameChange}
                             value={this.state.channelName}
                         >
                         </TextField>
-                        <Button type="submit">OK</Button>
-                        <Button onClick={this.onCancel}>Cancel</Button>
+                        <Button className={classes.button} type="submit">OK</Button>
+                        <Button className={classes.button} onClick={this.onCancel}>Cancel</Button>
                     </form>
                 </Paper>
             </DialogContent>
@@ -77,6 +80,7 @@ class Channel {
     notes = []
     duration = 0
     instrumentName = ""
+    color = ""
     constructor(name) {
         this.name = name
     }
