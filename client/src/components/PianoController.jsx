@@ -1,18 +1,24 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent } from "@material-ui/core";
+import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent, Card, CardHeader, CardContent, Typography, Icon, IconButton, Fab } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
-import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import ChannelsList from "./ChannelsList"
+import AddIcon from '@material-ui/icons/Add';
 import AddChannelForm from "./AddChannelForm"
+import ColorPicker from 'material-ui-color-picker'
 const styles = theme => ({
     controllerGrid: {
         marginBottom: 0
+    },
+    gridItem: {
+        overflow: "auto"
     },
     controlPaper: {
         padding: theme.spacing.unit * 2,
         textAlign: 'left',
         color: theme.palette.text.secondary,
+
     },
     backgroundDiv: {
         padding: theme.spacing.unit * 2,
@@ -24,14 +30,34 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        minWidth: 120,
+        minWidth: 80,
     },
+    buttons: {
+        padding: "2px",
+        minWidth: "40px",
+        margin: "2px",
+        display: "inline-flex"
+    },
+    fab: {
+        marginLeft: theme.spacing.unit,
+        float: "right",
+        padding: 0,
+        width: "35px",
+        height: "30px"
+    },
+    colorPicker: {
+        zIndex: 1000,
+        position: "fixed",
+        padding: "10px",
+
+    }
 });
 
 class PianoController extends Component {
 
     state = {
-        newChannelModal: false
+        newChannelModal: false,
+        colorModal: false
     }
     onSubmitNewChannel = (channel) => {
         this.props.onSubmitNewChannel(channel)
@@ -41,6 +67,12 @@ class PianoController extends Component {
     }
     onClickAddChannel = () => {
         this.setState({ newChannelModal: true })
+    }
+    openColorModal = () => {
+        this.setState({ colorModal: true })
+    }
+    removeChannel = (name) => {
+        this.props.onRemoveChannel(name)
     }
     onCancel = () => {
         this.setState({
@@ -67,6 +99,8 @@ class PianoController extends Component {
             playAllChannels,
             onClickAddChannel,
             channels,
+            selectChannel,
+            setColor,
             noteRange } = this.props;
         const midiNumbersToNotes = MidiNumbers.NATURAL_MIDI_NUMBERS.reduce((obj, midiNumber) => {
             obj[midiNumber] = MidiNumbers.getAttributes(midiNumber).note;
@@ -74,10 +108,11 @@ class PianoController extends Component {
         }, {});
         return (
             <div>
-                <Paper className={classes.controlPaper}>
+                <Paper className={classes.controlPaper} style={{ height: this.props.windowHeight }}>
                     <Grid container spacing={24} className={classes.controllerGrid}>
-                        <Grid item xs={4}>
+                        <Grid className={classes.gridItem} item xs={4}>
                             <form className={classes.root} >
+
                                 <FormControl className={classes.formControl}>
                                     <InputLabel htmlFor="first-note">Start Note</InputLabel>
                                     <Select
@@ -119,42 +154,52 @@ class PianoController extends Component {
                                 </FormControl>
                             </form>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid className={classes.gridItem} item xs={4}>
                             <FormControlLabel
-                                className={classes.formControl}
                                 label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
                                 control={<Switch
                                     onChange={toggleRecording}
                                     checked={recordingOn}
                                     value={recordingOn}
                                 />}>
-
                             </FormControlLabel>
-                            <div className="mt-5">
-                                <Button onClick={onClickPlay}>Play</Button>
-                                <Button onClick={onClickStop}>Stop</Button>
-                                <Button onClick={onClickClear}>Clear</Button>
-                                <Button onClick={onClickUndo}>Undo</Button>
-                                <Button onClick={onClickSave}>Save</Button>
-                                <Button onClick={playAllChannels}>Play All</Button>
-                                <Button onClick={onClickReset}>Reset</Button>
+                            <div >
+                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickPlay}>Play</Button>
+                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickStop}>Stop</Button>
+                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickClear}>Clear</Button>
+                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickUndo}>Undo</Button>
+                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickSave}>Save</Button>
+                                <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play All</Button>
+                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickReset}>Reset</Button>
                             </div>
                             <div className="mt-5">
-                                {/* <strong>Recorded notes</strong>
-                                <div>{JSON.stringify(recording)}</div> */}
+                                <FormControl className={classes.formControl}>
+                                    <div className={classes.colorPicker}>
+                                        <ColorPicker
+                                            name='color'
+                                            defaultValue='#f2046d'
+                                            label="Channel Color"
+                                            // value={this.state.color} - for controlled component
+                                            onChange={setColor}
+
+                                        />
+                                        {/* <Button style={{display:"block"}}onClick={this.closeColorPicker}>Close</Button> */}
+                                    </div>
+                                </FormControl>
                             </div>
 
                         </Grid>
-                        <Grid item xs={4}>
-                            <ChannelsList channels={channels}></ChannelsList>
-                            <Button onClick={this.onClickAddChannel}>Add Channel</Button>
+                        <Grid className={classes.gridItem} item xs={4}>
+                            <Fab color="primary" aria-label="Add" onClick={this.onClickAddChannel} className={classes.fab}>
+                                <AddIcon />
+                            </Fab>
+                            <ChannelsList channels={channels} selectChannel={selectChannel} removeChannel={this.removeChannel}></ChannelsList>
                             <Modal autoFocus={false} open={this.state.newChannelModal}>
                                 <AddChannelForm
                                     instrumentList={instrumentList}
                                     onSubmitNewChannel={this.onSubmitNewChannel}
                                     onCancel={this.onCancel}
                                 >
-
                                 </AddChannelForm>
                             </Modal>
                         </Grid>
@@ -184,17 +229,5 @@ PianoController.propTypes = {
     noteRange: PropTypes.object
 }
 
-function ChannelsList(props) {
-    return (
-        <List>Channels
-            {props.channels.map((c, i) => (
-            <ListItem key={i}>
-                <ListItemText primary={c.name} />
-            </ListItem>
-        ))}
-
-        </List>
-    );
-}
 
 

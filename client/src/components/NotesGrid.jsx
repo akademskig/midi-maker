@@ -1,6 +1,6 @@
 import React from "react";
 import { MidiNumbers } from 'react-piano';
-import Dimensions from 'react-dimensions';
+import Dimensions from '../providers/DimensionsProvider';
 import _ from "lodash"
 import { CircularProgress } from "@material-ui/core";
 class NotesGrid extends React.Component {
@@ -12,7 +12,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer" style={{
-                height: window.innerHeight / 2 - 30, bottom: window.innerHeight / 5
+                height: this.props.height / 2, bottom: this.props.height / 5
             }}>
 
                 <Canvas
@@ -23,6 +23,7 @@ class NotesGrid extends React.Component {
                     stopNote={this.props.stopNote}
                     loading={this.props.isLoading}
                     playAll={this.props.playAll}
+                    channelColor={this.props.channelColor}
                     onClickPlay={this.props.onClickPlay}
                     canvasContainer={canvasContainer}
                     setRecording={this.props.setRecording}
@@ -36,7 +37,7 @@ class NotesGrid extends React.Component {
     }
 }
 
-export default Dimensions()(NotesGrid)
+export default Dimensions(NotesGrid)
 const canvasStyle = {
     background: "rgba(4,32,55,0.7)"
 }
@@ -65,7 +66,8 @@ class Canvas extends React.Component {
     maxTime = 0
     state = {
         playing: false,
-        timesRemained: []
+        timesRemained: [],
+        channelColor: "#f2046d"
     }
     timer
 
@@ -75,6 +77,7 @@ class Canvas extends React.Component {
         this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
         if (this.props.channels.length > 0) {
             this.props.channels.forEach(c => {
+                c.notes.forEach(n => n.color = c.color)
                 joinedEvents = joinedEvents.concat(c.notes)
                 if (c.duration > this.time)
                     this.time = c.duration
@@ -116,14 +119,14 @@ class Canvas extends React.Component {
                 const x = RECT_WIDTH + Math.floor(n.time * RECT_WIDTH * RECT_TIME) + this.offsetFirst
                 const y = Math.floor(canvas.height - ((n.midiNumber - this.props.midiOffset) * RECT_HEIGHT + RECT_SPACE * (n.midiNumber - this.props.midiOffset))) - (RECT_HEIGHT + RECT_SPACE)
                 const width = Math.floor(n.duration * RECT_WIDTH * RECT_TIME)
-                c.fillStyle = NOTE_COLOR
+                c.fillStyle = n.color ? n.color : this.state.channelColor
                 c.clearRect(x, y, width, RECT_HEIGHT);
                 c.fillRect(x, y, width, RECT_HEIGHT);
 
             });
         }
         this.eventsRect.forEach(eventRect => {
-            c.fillStyle = NOTE_COLOR
+            c.fillStyle = RECT_COLOR
             c.clearRect(eventRect.x, eventRect.y, RECT_WIDTH, RECT_HEIGHT);
             c.fillRect(eventRect.x, eventRect.y, RECT_WIDTH, RECT_HEIGHT);
         })
@@ -174,7 +177,6 @@ class Canvas extends React.Component {
         window.setTimeout(() => this.stop(), this.maxTime * 1000)
     }
     showRecordingBar = () => {
-        this.props.onClickPlay()
         const timesRemained = []
         const canvas = this.refs.canvas
         for (let i = 0; i < REC_TIME; i += 0.1) {
@@ -241,7 +243,7 @@ class Canvas extends React.Component {
             duration: 1 / RECT_TIME
         }
 
-        let duplicate = this.props.recordingGrid.events.findIndex(e => _.isEqual(e, lastEvent))
+        let duplicate = this.props.recordingGrid.events.findIndex(e => _.isEqual(e.midiNumber, lastEvent.midiNumber) && e.time === lastEvent.time)
         if (duplicate !== -1 && this.props.recordingGrid.events.length > 0) {
             let lastTime = 0
             this.props.recordingGrid.events.splice(duplicate, 1)
@@ -278,6 +280,10 @@ class Canvas extends React.Component {
         }
         if (newProps.recordingGrid.mode === "PLAYING" && this.props.recordingGrid.mode !== "PLAYING")
             this.play()
+        if (newProps.channelColor !== this.props.channelColor)
+            this.setState({
+                channelColor: newProps.channelColor
+            })
         if (this.props.recordingGrid.mode === "PLAYING" && newProps.recordingGrid.mode === "NOT_PLAYING")
             this.stop()
         // if (newProps.recordingGrid.mode === "PLAYING_ALL" && this.props.recordingGrid.mode !== "PLAYING_ALL")

@@ -13,7 +13,7 @@ class PianoControllerProvider extends React.Component {
         instrumentName: "acoustic_grand_piano",
         recordingPiano: {
             mode: 'NOT_RECORDING',
-            reset:true,
+            reset: true,
             events: [],
             currentTime: 0,
             currentEvents: [],
@@ -24,9 +24,10 @@ class PianoControllerProvider extends React.Component {
             currentTime: 0,
             currentEvents: [],
         },
-        channels:[],
+        channels: [],
         recordingOn: false,
-        absTime:0
+        absTime: 0,
+        channelColor: "#f2046d"
     }
     scheduledEvents = [];
 
@@ -35,8 +36,8 @@ class PianoControllerProvider extends React.Component {
 
         if (this.state.channels.length > 0) {
             this.state.channels.map(c => {
-                const notes= c.notes.map(n => {
-                    return Object.assign({},n, {instrumentName: c.instrumentName})
+                const notes = c.notes.map(n => {
+                    return Object.assign({}, n, { instrumentName: c.instrumentName })
                 })
                 joinedEvents = joinedEvents.concat(notes)
             })
@@ -49,7 +50,7 @@ class PianoControllerProvider extends React.Component {
         );
     };
     getRecordingEndTime = () => {
-        const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+        const joinedEvents = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
         if (joinedEvents.length === 0) {
             return 0;
         }
@@ -74,10 +75,10 @@ class PianoControllerProvider extends React.Component {
             mode: 'PLAYING',
         });
         this.setRecordingGrid({
-            mode:"PLAYING"
+            mode: "PLAYING"
         })
 
-        const joinedEvents=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+        const joinedEvents = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
         const startAndEndTimes = _.uniq(
             _.flatMap(joinedEvents, event => [
                 event.time,
@@ -102,12 +103,12 @@ class PianoControllerProvider extends React.Component {
             this.onFinish();
         }, this.getRecordingEndTime() * 1000);
     };
-    playAllChannels=()=>{
+    playAllChannels = () => {
         this.setRecording({
             mode: 'PLAYING',
         });
         this.setRecordingGrid({
-            mode:"PLAYING"
+            mode: "PLAYING"
         })
         this.props.playAll(this.state.channels)
         setTimeout(() => {
@@ -152,7 +153,7 @@ class PianoControllerProvider extends React.Component {
         this.setRecording({
             mode: "NOT_RECORDING",
             events: [],
-            reset:true,
+            reset: true,
             currentEvents: [],
             currentTime: 0,
         });
@@ -169,11 +170,11 @@ class PianoControllerProvider extends React.Component {
             return
         }
         const eventsLength = this.state.recordingPiano.events.length
-        const newEvents=this.state.recordingPiano.events.slice(0, eventsLength - 1)
+        const newEvents = this.state.recordingPiano.events.slice(0, eventsLength - 1)
         this.setRecording({
             mode: "NOT_RECORDING",
             events: newEvents,
-            currentTime: newEvents[newEvents.length - 1].time +newEvents[newEvents.length - 1].duration
+            currentTime: newEvents[newEvents.length - 1].time + newEvents[newEvents.length - 1].duration
         })
         this.setState({
             recordingOn: false,
@@ -209,10 +210,11 @@ class PianoControllerProvider extends React.Component {
     };
 
     onSubmitNewChannel = (newChannel) => {
-        newChannel.notes=this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
-        newChannel.instrumentName=this.state.instrumentName
+        newChannel.notes = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
+        newChannel.instrumentName = this.state.instrumentName
         this.props.loadChannelInstrument(this.state.instrumentName)
-        newChannel.duration=Math.max(this.state.recordingPiano.currentTime,this.state.recordingGrid.currentTime)
+        newChannel.duration = Math.max(this.state.recordingPiano.currentTime, this.state.recordingGrid.currentTime)
+        newChannel.color = this.state.channelColor
         const newChannelList = this.state.channels.concat(newChannel)
 
         this.setState({
@@ -220,7 +222,22 @@ class PianoControllerProvider extends React.Component {
         })
         this.onClickClear()
     }
+    onRemoveChannel = (key) => {
+        this.setState({
+            channels: this.state.channels.filter((c, i) => i !== key)
+        })
+    }
+    onSelectChannel = (key) => {
+        const channel = this.state.channels[key]
 
+        this.state.channels.splice(key, 1)
+
+        this.setRecordingGrid({
+            events: channel.notes,
+            currentTime: channel.duration,
+        })
+        this.props.loadInstrument(channel.instrumentName)
+    }
     onClickReset = () => {
         this.setRecording({
             reset: true
@@ -248,11 +265,16 @@ class PianoControllerProvider extends React.Component {
         })
     }
 
-
+    setColor = (color) => {
+        if (color)
+            this.setState({
+                channelColor: color
+            })
+    }
 
     render() {
         const propsToPass = {
-            absTime:this.state.absTime,
+            absTime: this.state.absTime,
             toggleRecording: this.toggleRecording,
             onChangeInstrument: this.onChangeInstrument,
             onChangeFirstNote: this.onChangeFirstNote,
@@ -268,16 +290,20 @@ class PianoControllerProvider extends React.Component {
             recordingGrid: this.state.recordingGrid,
             setRecording: this.setRecording,
             setRecordingGrid: this.setRecordingGrid,
+            channelColor: this.state.channelColor,
             instrumentName: this.state.instrumentName,
             instrumentList: this.props.instrumentList,
-            channels:this.state.channels,
-            playAllChannels:this.playAllChannels,
+            channels: this.state.channels,
+            playAllChannels: this.playAllChannels,
             onSubmitNewChannel: this.onSubmitNewChannel,
-            onCancel: this.onCancel
+            onRemoveChannel: this.onRemoveChannel,
+            onCancel: this.onCancel,
+            selectChannel: this.onSelectChannel,
+            setColor: this.setColor
         }
         return (
             React.Children.map(this.props.children, (child) => {
-                return React.cloneElement(child, { ...propsToPass,...this.props });
+                return React.cloneElement(child, { ...propsToPass, ...this.props });
             })
         )
     }
