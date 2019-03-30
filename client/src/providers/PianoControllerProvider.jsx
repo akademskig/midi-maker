@@ -6,6 +6,7 @@ import InstrumentListWrapper from './InstrumentListProvider';
 class PianoControllerProvider extends React.Component {
 
     state = {
+        url:null,
         noteRange: {
             first: 43,
             last: 67,
@@ -180,9 +181,16 @@ class PianoControllerProvider extends React.Component {
             recordingOn: false,
         })
     }
-    onClickSave = () => {
+    onClickSave = async () => {
         const instrumentIndex = this.props.instrumentList.findIndex(i => i === this.state.instrumentName)
-        saveMidi(this.state.recordingPiano.events, instrumentIndex)
+        const blob = await saveMidi(this.state.recordingGrid.events, instrumentIndex)
+        var url  = window.URL.createObjectURL(blob);
+        this.setState({
+            url
+        })
+    }
+    clearLink=()=>{
+        this.setState({url:null})
     }
     onChangeFirstNote = (event) => {
         this.setState({
@@ -274,6 +282,8 @@ class PianoControllerProvider extends React.Component {
 
     render() {
         const propsToPass = {
+            url:this.state.url,
+            clearLink:this.clearLink,
             absTime: this.state.absTime,
             toggleRecording: this.toggleRecording,
             onChangeInstrument: this.onChangeInstrument,
