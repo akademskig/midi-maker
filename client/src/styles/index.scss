@@ -1,0 +1,35 @@
+@theme-blue: "blue";
+
+.gridContainer {
+    display: flex;
+    width: 100%;
+    position: fixed;
+    overflow-x: auto;
+    background: black;
+    align-items: center;
+    text-align: center;
+
+    div {
+        text-align: center;
+        margin: auto;
+    }
+}
+
+#canvas {
+    cursor: pointer
+}
+.gridContainer {
+    width: 100%;
+    position: fixed;
+    overflow: scroll;
+  }
+  ::-webkit-scrollbar {
+    /* remove scrollbar space */
+    background: white;
+    width:5px;
+    /* optional: just make scrollbar invisible */
+  }
+  ::-webkit-scrollbar-thumb {
+      width:5px;
+    background: rgb(65, 65, 131);
+  }
