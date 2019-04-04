@@ -176,7 +176,7 @@ class PianoController extends Component {
                                 <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play All</Button>
                                 <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickReset}>Reset</Button>
                             </div>
-                            {url?<a href={this.props.url} onClick={clearLink}download="file">Download</a>:null}
+                            {url ? <a href={this.props.url} onClick={clearLink} download="file">Download</a> : null}
                             <div></div>
                             <div className="mt-5">
                                 <FormControl className={classes.formControl}>

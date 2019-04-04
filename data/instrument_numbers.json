@@ -122,27 +122,27 @@
     {
       "hexcode": "0x18",
       "family": "Guitar",
-      "instrument": "Acoustic Guitar (nylon)"
+      "instrument": "Acoustic Guitar Nylon"
     },
     {
       "hexcode": "0x19",
       "family": "Guitar",
-      "instrument": "Acoustic Guitar (steel)"
+      "instrument": "Acoustic Guitar Steel"
     },
     {
       "hexcode": "0x1A",
       "family": "Guitar",
-      "instrument": "Electric Guitar (jazz)"
+      "instrument": "Electric Guitar Jazz"
     },
     {
       "hexcode": "0x1B",
       "family": "Guitar",
-      "instrument": "Electric Guitar (clean)"
+      "instrument": "Electric Guitar Clean"
     },
     {
       "hexcode": "0x1C",
       "family": "Guitar",
-      "instrument": "Electric Guitar (muted)"
+      "instrument": "Electric Guitar Muted"
     },
     {
       "hexcode": "0x1D",
@@ -157,7 +157,7 @@
     {
       "hexcode": "0x1F",
       "family": "Guitar",
-      "instrument": "Guitar harmonics"
+      "instrument": "Guitar Harmonics"
     },
     {
       "hexcode": "0x20",

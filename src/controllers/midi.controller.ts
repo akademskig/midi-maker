@@ -4,7 +4,7 @@ import Midi from "@tonejs/midi"
 import { Buffer } from "buffer";
 
 const addNew = async (req: Request, res: Response) => {
-    const { midiData} = req.body
+    const { midiData } = req.body
     const midi = await encodeMidi(midiData)
     let filename = `${process.cwd()}/midis/${req.body.name.replace(/\s/g, "")}`
     fs.writeFileSync(filename + ".mid", Buffer.from(midi.toArray()))
@@ -30,7 +30,7 @@ const converToMp3 = async (file: string) => {
 }
 const encodeMidi = async (midiData: Array<any>) => {
     var midi = new Midi()
-    midiData.forEach(async (channel,i )=> {
+    midiData.forEach(async (channel, i) => {
         const iNum = await fetchInstrumentNumber(channel.instrumentName)
 
         if (iNum == null) {
@@ -40,7 +40,8 @@ const encodeMidi = async (midiData: Array<any>) => {
         const track = midi.addTrack()
         track.instrument.number = iNum
         track.name = channel.instrumentName
-        track.channel=i
+        track.channel = i
+
         channel.notes.forEach((mt: any) => {
             track.addNote({
                 midi: mt.midiNumber,
@@ -57,7 +58,7 @@ const fetchInstrumentNumber = async (instrument: string) => {
     let file = fs.readFileSync("./data/instrument_numbers.json").toString("utf8")
     let json = JSON.parse(file)
     for (let i = 0; i < json.instruments.length; i++) {
-        if (json.instruments[i].instrument === formatted)
+        if (json.instruments[i].instrument.toLowerCase() === formatted.toLocaleLowerCase())
             return i
     }
 }
