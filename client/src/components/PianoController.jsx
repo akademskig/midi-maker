@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent, Card, CardHeader, CardContent, Typography, Icon, IconButton, Fab } from "@material-ui/core";
+import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
-import AddIcon from '@material-ui/icons/Add';
 import AddChannelForm from "./AddChannelForm"
 import ColorPicker from 'material-ui-color-picker'
-import { Link, withRouter } from 'react-router-dom'
 const styles = theme => ({
     controllerGrid: {
         marginBottom: 0
@@ -196,9 +194,7 @@ class PianoController extends Component {
 
                         </Grid>
                         <Grid className={classes.gridItem} item xs={4}>
-                            <Fab color="primary" aria-label="Add" onClick={this.onClickAddChannel} className={classes.fab}>
-                                <AddIcon />
-                            </Fab>
+
                             <ChannelsList channels={channels} selectChannel={selectChannel} removeChannel={this.removeChannel}></ChannelsList>
                             <Modal autoFocus={false} open={this.state.newChannelModal}>
                                 <AddChannelForm

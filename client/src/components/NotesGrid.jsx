@@ -74,10 +74,7 @@ class Canvas extends React.Component {
     }
 
     drawInitial = (canvas, timer, playAll) => {
-        console.log(this.props.currentChannel, "canvas")
-        // let joinedEvents = this.props.recordingGrid.events.concat(this.props.recording.events)
         let joinedEvents = []
-        // this.time = Math.max(this.props.recordingGrid.currentTime, this.props.recording.currentTime)
         if (this.props.channels.length > 0) {
             this.props.channels.forEach(c => {
                 c.notes.forEach(n => n.color = c.color)
@@ -155,7 +152,7 @@ class Canvas extends React.Component {
         if (this.props.controller.playing)
             return
         const canvas = this.refs.canvas
-        for (let i = 0; i < this.maxTime; i += 0.1) {
+        for (let i = 0; i < this.maxTime; i += 0.05) {
             let t = window.setTimeout(() => {
                 let count = i
                 this.drawInitial(canvas, count)
@@ -165,19 +162,6 @@ class Canvas extends React.Component {
         window.setTimeout(() => this.stop(), this.maxTime * 1000)
     }
 
-    playAll = () => {
-        if (this.props.controller.playing)
-            return
-        const canvas = this.refs.canvas
-        for (let i = 0; i < this.maxTime; i += 0.1) {
-            let t = window.setTimeout(() => {
-                let count = i
-                this.drawInitial(canvas, count, true)
-            }, Math.ceil(i * 1000))
-            this.timers.push(t)
-        }
-        window.setTimeout(() => this.stop(), this.maxTime * 1000)
-    }
     showRecordingBar = () => {
         const timesRemained = []
         const canvas = this.refs.canvas
@@ -196,7 +180,6 @@ class Canvas extends React.Component {
         this.lastRect = null
     }
     stopRecordingBar = (pause) => {
-        console.log(this.props.recording.currentTime, "stop")
         const canvas = this.refs.canvas
         this.recordingTimers.forEach(t => clearTimeout(t))
         if (!pause)
@@ -211,10 +194,8 @@ class Canvas extends React.Component {
         })
     }
     resumeRec = () => {
-        console.log("resume")
         const canvas = this.refs.canvas
         const tr = this.state.timesRemained
-        console.log(tr, this.props.recording)
         let start = null
         for (let i = 0; i < tr.length; i++) {
             if (tr[i] < this.props.recording.currentTime)
@@ -228,7 +209,6 @@ class Canvas extends React.Component {
             this.recordingTimers.push(t)
         }
         window.setTimeout(() => this.totalTime * 1000)
-
     }
     showCoords = (event) => {
         var x = event.clientX + this.props.canvasContainer.scrollLeft
