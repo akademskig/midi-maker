@@ -21,7 +21,7 @@ class SoundfontProvider extends React.Component {
         soundfont: 'MusyngKite',
         instrumentName: 'acoustic_grand_piano',
     };
-    instruments=[]
+    instruments = []
 
     constructor(props) {
         super(props);
@@ -75,15 +75,14 @@ class SoundfontProvider extends React.Component {
     };
 
 
-   playAll  = async (channels)=>       {
-    //    console.log(channels)
-    //     await this.channelsToPlaylist(channels)
+    playAll = async (channels) => {
+        //    console.log(channels)
+        //     await this.channelsToPlaylist(channels)
         let joinedEvents = []
-
         if (channels.length > 0) {
             channels.map(c => {
-                const notes= c.notes.map(n => {
-                    return Object.assign({},n, {instrumentName: c.instrumentName})
+                const notes = c.notes.map(n => {
+                    return Object.assign({}, n, { instrumentName: c.instrumentName })
                 })
                 joinedEvents = joinedEvents.concat(notes)
             })

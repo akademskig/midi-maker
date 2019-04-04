@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom'
-import { MainRouter } from './MainRouter';
-import "./styles/css/index.css"
+
+import "./styles/index.scss"
 
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import blue from '@material-ui/core/colors/blue';
+import NewMidi from './views/NewMidi';
 
 const theme = createMuiTheme({
   palette: {
@@ -25,9 +24,7 @@ const theme = createMuiTheme({
 
 const App = () => (
   <MuiThemeProvider theme={theme}>
-  <BrowserRouter>
-      <MainRouter/>
-  </BrowserRouter>
+    <NewMidi></NewMidi>
   </MuiThemeProvider>
 )
 
