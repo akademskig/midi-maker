@@ -154,6 +154,22 @@ class PianoController extends Component {
                                         ))}
                                     </Select>
                                 </FormControl>
+                                <div className="mt-5">
+                                    <FormControl className={classes.formControl}>
+                                        <div className={classes.colorPicker}>
+                                            <ColorPicker
+                                                name='color'
+                                                defaultValue='#f2046d'
+                                                label="Channel Color"
+                                                // value={this.state.color} - for controlled component
+                                                onChange={setColor}
+
+                                            />
+                                            {/* <Button style={{display:"block"}}onClick={this.closeColorPicker}>Close</Button> */}
+                                        </div>
+                                    </FormControl>
+                                </div>
+
                             </form>
                         </Grid>
                         <Grid className={classes.gridItem} item xs={4}>
@@ -166,31 +182,16 @@ class PianoController extends Component {
                                 />}>
                             </FormControlLabel>
                             <div >
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickPlay}>Play</Button>
+                                <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play</Button>
                                 <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickStop}>Stop</Button>
                                 <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickClear}>Clear</Button>
                                 <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickUndo}>Undo</Button>
                                 <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickSave}>Save</Button>
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play All</Button>
                                 <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickReset}>Reset</Button>
                             </div>
                             {url ? <a href={this.props.url} onClick={clearLink} download="file">Download</a> : null}
                             <div></div>
-                            <div className="mt-5">
-                                <FormControl className={classes.formControl}>
-                                    <div className={classes.colorPicker}>
-                                        <ColorPicker
-                                            name='color'
-                                            defaultValue='#f2046d'
-                                            label="Channel Color"
-                                            // value={this.state.color} - for controlled component
-                                            onChange={setColor}
 
-                                        />
-                                        {/* <Button style={{display:"block"}}onClick={this.closeColorPicker}>Close</Button> */}
-                                    </div>
-                                </FormControl>
-                            </div>
 
                         </Grid>
                         <Grid className={classes.gridItem} item xs={4}>

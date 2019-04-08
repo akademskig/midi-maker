@@ -1,35 +1,37 @@
-@theme-blue: "blue";
+@theme-blue: blue;
+
+#root {
+  background-color: white;
+  height: 100vh;
+}
 
 .gridContainer {
-    display: flex;
-    width: 100%;
-    position: fixed;
-    overflow-x: auto;
-    background: black;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  padding: 2px 0;
+  width: 100%;
+  position: fixed;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: black;
+  align-items: center;
 
-    div {
-        text-align: center;
-        margin: auto;
-    }
+  div {
+    text-align: center;
+    margin: auto;
+  }
 }
 
 #canvas {
-    cursor: pointer
+  cursor: pointer
 }
-.gridContainer {
-    width: 100%;
-    position: fixed;
-    overflow: scroll;
-  }
-  ::-webkit-scrollbar {
-    /* remove scrollbar space */
-    background: white;
-    width:5px;
-    /* optional: just make scrollbar invisible */
-  }
-  ::-webkit-scrollbar-thumb {
-      width:5px;
-    background: rgb(65, 65, 131);
-  }
+::-webkit-scrollbar {
+  /* remove scrollbar space */
+  background: white;
+  width: 5px;
+  height: 10px;
+  /* optional: just make scrollbar invisible */
+}
+::-webkit-scrollbar-thumb {
+  width: 5px;
+  background: rgb(65, 65, 131);
+}
