@@ -2,13 +2,12 @@
 
 #root {
   background-color: white;
-  height: 100vh;
+  height: 100vh-10;
 }
 
 .gridContainer {
   display: flex;
   padding: 2px 0;
-  width: 100%;
   position: fixed;
   overflow-x: auto;
   overflow-y: hidden;
@@ -24,6 +23,7 @@
 #canvas {
   cursor: pointer
 }
+
 ::-webkit-scrollbar {
   /* remove scrollbar space */
   background: white;
@@ -31,7 +31,68 @@
   height: 10px;
   /* optional: just make scrollbar invisible */
 }
+
 ::-webkit-scrollbar-thumb {
   width: 5px;
   background: rgb(65, 65, 131);
+  border-radius: 4px;
+}
+
+.btn-row-1 {
+  margin-bottom: 10px;
+}
+
+.ctrl-piano-config-bar {
+  width: 250px;
+  background-color: #ffffff;
+  z-index: 1000;
+  color: white;
+
+  #select-container {
+    display: block;
+    position: relative;
+
+  }
+
+  .c-1 {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    padding: 3px;
+
+  }
+
+  .c-2 {
+    select {
+      margin: 0 auto;
+      color: #EC6F66;
+      width: 210px;
+      padding: 15px;
+      height: 25px;
+      cursor: pointer;
+      background: url(http://sharpik.com/wip/cuteselect/arrow.png) 295px 12px no-repeat white;
+    }
+
+    select:hover {
+      background-color: transparent;
+      color: white;
+      padding: 15px 5px 15px 25px;
+    }
+
+    select option {
+      background-color: white;
+      color: gray;
+      width: 210px;
+      padding: 10px 15px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    select option:hover {
+      padding-left: 25px;
+      width: 270px;
+      color: #EC6F66;
+    }
+  }
+
 }
