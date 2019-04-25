@@ -12,7 +12,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer"
-            style={{ height: this.props.height / 2+60, bottom: this.props.height / 5}}
+            style={{ height: this.props.height / 1.6+30, bottom: this.props.height / 5}}
             >
 
                 <Canvas

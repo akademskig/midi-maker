@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
 import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Drawer, IconButton } from "@material-ui/core";
-import { Settings, CloudDownload, Save } from '@material-ui/icons';
+import { Settings, CloudDownload, Save, PlayArrow, StopRounded, ClearAll, UndoOutlined, FormatColorReset } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
@@ -22,18 +22,28 @@ const styles = theme => ({
     grid: {
         width: "100%",
         margin: 0,
+        padding: "20px",
+        display: "flex"
     },
     gridItem: {
         display: "flex",
-        flexDirection: "column",
+    },
+    gridItemRow: {
+        display: "flex",
+        flexDirection: "row",
+        alignContent: "flex-start"
+
     },
     gridItemRight: {
         display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end"
+        flexDirection: "row",
+        justifyContent: "flex-end"
     },
     icons: {
         fontSize: "35px",
+    },
+    iconButton: {
+        marginRight: "1vw"
     },
     backgroundDiv: {
         padding: theme.spacing.unit * 2,
@@ -139,7 +149,7 @@ class PianoController extends Component {
                         <IconButton onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
 
                     </Grid>
-                    <Grid className={classes.gridItem} item xs={4}>
+                    <Grid className={classes.gridItem} item xs={5}>
                         <FormControlLabel
                             label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
                             control={<Switch
@@ -149,33 +159,56 @@ class PianoController extends Component {
                             />}>
 
                         </FormControlLabel>
-                        <Button className={classes.buttons} style={{ maxWidth: "150px" }} variant="contained" color="primary" onClick={onClickReset}>Reset</Button>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickReset}>
+                                <FormatColorReset className={classes.icons}></FormatColorReset>
+                            </IconButton>
+                        </div>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
 
+                                <UndoOutlined className={classes.icons}>
+
+                                </UndoOutlined>
+
+                            </IconButton>
+                        </div>
+                        <div className="btn-row-1">
+
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickClear}>
+                                <ClearAll className={classes.icons}></ClearAll>
+                            </IconButton>
+                        </div>
                     </Grid>
-                    <Grid className={classes.gridItem} item xs={5}>
+                    <Grid className={classes.gridItemRow} item xs={4}>
                         <div className="btn-row-1">
-                            <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play</Button>
-                            <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickStop}>Stop</Button>
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={playAllChannels}>
+                                <PlayArrow className={classes.icons}></PlayArrow>
+                            </IconButton>
                         </div>
                         <div className="btn-row-1">
-                            <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickClear}>Clear</Button>
-                            <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickUndo}>Undo</Button>
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickStop}>
+                                <StopRounded className={classes.icons}></StopRounded>
+                            </IconButton>
                         </div>
+
+
                     </Grid>
                     <Grid className={classes.gridItemRight} item xs={2}>
                         <div className="btn-row-1">
-                            <IconButton className={classes.buttons} variant="contained" color="primary" onClick={onClickSave}>
+                            {url ? <a href={this.props.url} onClick={clearLink} download="file">
+                                <IconButton className={classes.iconButton} >
+                                    <CloudDownload className={classes.icons}></CloudDownload>
+                                </IconButton></a> : null}
+
+                        </div>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
                                 <Save className={classes.icons}></Save>
                             </IconButton>
                         </div>
 
-                        <div className="btn-row-1">
-                            {url ? <a href={this.props.url} onClick={clearLink} download="file">
-                                <IconButton className={classes.buttons} >
-                                    <CloudDownload></CloudDownload>
-                                </IconButton></a> : null}
 
-                        </div>
                     </Grid>
                 </Grid>
                 <Drawer open={this.state.openNav} onClose={this.toggleDrawer(false)}>

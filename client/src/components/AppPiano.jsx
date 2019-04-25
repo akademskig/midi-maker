@@ -20,7 +20,6 @@ class AppPiano extends React.Component {
     };
 
     notesList = []
-
     prevNote = null
     absTime = 0
     prevStopped = false
