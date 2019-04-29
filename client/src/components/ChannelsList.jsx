@@ -1,10 +1,8 @@
-import { Typography, withStyles, List, ListItem, Fab, Button, IconButton } from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import { Typography, withStyles, List, ListItem,  IconButton } from "@material-ui/core";
 import RemoveIcon from '@material-ui/icons/Remove';
 import React from "react"
 const styles = theme => ({
     listItem: {
-        // borderRadius: "3px",
         boxShadow:theme.shadows[2],
         display:"inline-block"
     },

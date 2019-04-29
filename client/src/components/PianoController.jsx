@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Drawer, IconButton } from "@material-ui/core";
+import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton } from "@material-ui/core";
 import { Settings, CloudDownload, Save, PlayArrow, StopRounded, ClearAll, UndoOutlined, FormatColorReset } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';

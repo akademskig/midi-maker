@@ -80,7 +80,7 @@ class SoundfontProvider extends React.Component {
                 const notes = c.notes.map(n => {
                     return Object.assign({}, n, { instrumentName: c.instrumentName })
                 })
-                joinedEvents = joinedEvents.concat(notes)
+                return joinedEvents = joinedEvents.concat(notes)
             })
         }
         const startAndEndTimes = _.uniq(

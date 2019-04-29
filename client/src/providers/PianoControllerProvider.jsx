@@ -1,6 +1,5 @@
 import React from 'react';
 import { saveMidi } from "../services/midiService"
-import _ from 'lodash';
 import InstrumentListWrapper from './InstrumentListProvider';
 import { Channel } from '../models/channel';
 
@@ -43,7 +42,7 @@ class PianoControllerProvider extends React.Component {
                 const notes = c.notes.map(n => {
                     return Object.assign({}, n, { instrumentName: c.instrumentName })
                 })
-                joinedEvents = joinedEvents.concat(notes)
+                return joinedEvents = joinedEvents.concat(notes)
             })
         }
         if (joinedEvents.length === 0) {
@@ -146,7 +145,7 @@ class PianoControllerProvider extends React.Component {
     }
     onClickClear = () => {
         this.onClickStop();
-        const channel = this.state.channels.find(c => c.name == this.state.currentChannel.name)
+        const channel = this.state.channels.find(c => c.name === this.state.currentChannel.name)
         if (!channel)
             return
         channel.notes = []

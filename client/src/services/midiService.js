@@ -1,12 +1,10 @@
 import {
     config
 } from "../config"
-import Midi from "@tonejs/midi"
 
 const apiUrl = `${window.location.protocol}//${window.location.hostname}:${config.PORT}`
 
-export const saveMidi = (midiData, instrumentNumber) => {
-
+export const saveMidi = (midiData) => {
     const midiBody = {
         name: "test2",
         midiData
@@ -16,7 +14,6 @@ export const saveMidi = (midiData, instrumentNumber) => {
         headers: {
             'Accept': 'application/json',
             "Content-Type": "application/json"
-            //   'Authorization': 'Bearer ' + credentials.t
         },
         body: JSON.stringify(midiBody)
     }).then((response) => {

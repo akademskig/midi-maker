@@ -108,21 +108,14 @@ class AppPiano extends React.Component {
             height,
             classes,
             stopNote,
-            recording,
-            setRecording,
             noteRange,
-            channels,
-            instrumentName,
-            ...pianoProps
         } = this.props;
         const keyboardShortcuts = KeyboardShortcuts.create({
             firstNote: noteRange.first,
             lastNote: noteRange.last,
             keyboardConfig: KeyboardShortcuts.HOME_ROW,
         });
-        // const { mode, currentEvents } = recording;
-        // const activeNotes =
-        //     mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
+
         return (
             <div className={classes.piano} style={{ height: height / 5 + "px" }} >
                 {this.props.isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
