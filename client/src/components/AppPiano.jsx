@@ -20,7 +20,6 @@ class AppPiano extends React.Component {
     };
 
     notesList = []
-
     prevNote = null
     absTime = 0
     prevStopped = false
@@ -33,7 +32,7 @@ class AppPiano extends React.Component {
         if (this.prevNote === midiNumber && !this.prevStopped)
             return
         if (this.props.recording.currentTime === 0 && !this.started) {
-            this.setState({ absTime: this.props.absTime })
+            this.absTime = this.props.absTime
             this.started = true
         }
         const startTime = Date.now()
@@ -49,7 +48,7 @@ class AppPiano extends React.Component {
     };
 
     onStopNoteInput = (midiNumber, { prevActiveNotes }) => {
-        if (this.props.recording.mode !== 'RECORDING') {
+        if (!this.props.controller.recording) {
             return;
         }
         this.notesList = this.notesList.filter(nl =>
@@ -70,7 +69,7 @@ class AppPiano extends React.Component {
 
     };
     recordNotes = (midiNumbers, duration, startTime) => {
-        if (this.props.recording.mode !== 'RECORDING') {
+        if (!this.props.controller.recording) {
             return;
         }
 
@@ -81,17 +80,22 @@ class AppPiano extends React.Component {
                 duration: duration / 1000,
             };
         });
-
         this.props.setRecording({
-            events: this.props.recording.events.concat(newEvents),
-            currentTime: (Date.now() + duration - this.state.absTime) / 1000,
+            events: this.props.currentChannel ? this.props.currentChannel.notes.concat(newEvents) : newEvents,
+            currentTime: (Date.now() + duration - this.absTime) / 1000,
         });
     };
 
     componentWillReceiveProps = (curr) => {
         if (curr.recordingOn && !this.props.recordingOn) {
             const elapsed = Date.now() - (this.props.recording.currentTime * 1000 + this.state.absTime)
+            this.absTime = elapsed + this.absTime
             this.setState({ absTime: elapsed + this.state.absTime })
+        }
+        if (this.props.controller.reset && !curr.controller.reset) {
+            this.setRecording({
+                currentTime: 0
+            })
         }
         if (this.props.height !== curr.height)
             this.setState({
@@ -116,9 +120,9 @@ class AppPiano extends React.Component {
             lastNote: noteRange.last,
             keyboardConfig: KeyboardShortcuts.HOME_ROW,
         });
-        const { mode, currentEvents } = recording;
-        const activeNotes =
-            mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
+        // const { mode, currentEvents } = recording;
+        // const activeNotes =
+        //     mode === 'PLAYING' || mode === "RECORDING" ? currentEvents.map(event => event.midiNumber) : null;
         return (
             <div className={classes.piano} style={{ height: height / 5 + "px" }} >
                 {this.props.isLoading ? <LinearProgress color="secondary" style={{ height: "5px" }}></LinearProgress> : ""}
@@ -130,7 +134,7 @@ class AppPiano extends React.Component {
                     keyboardShortcuts={keyboardShortcuts}
                     onPlayNoteInput={this.onPlayNoteInput}
                     onStopNoteInput={this.onStopNoteInput}
-                    activeNotes={activeNotes && activeNotes[0] ? activeNotes : null}
+                // activeNotes={activeNotes && activeNotes[0] ? activeNotes : null}
 
                 />
             </div>

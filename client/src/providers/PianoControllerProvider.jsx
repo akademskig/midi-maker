@@ -2,36 +2,39 @@ import React from 'react';
 import { saveMidi } from "../services/midiService"
 import _ from 'lodash';
 import InstrumentListWrapper from './InstrumentListProvider';
+import { Channel } from '../models/channel';
 
 class PianoControllerProvider extends React.Component {
 
     state = {
-        url:null,
+        url: null,
         noteRange: {
             first: 43,
             last: 67,
         },
         instrumentName: "acoustic_grand_piano",
         recordingPiano: {
-            mode: 'NOT_RECORDING',
-            reset: true,
+
             events: [],
             currentTime: 0,
-            currentEvents: [],
         },
         recordingGrid: {
-            mode: 'NOT_RECORDING',
             events: [],
             currentTime: 0,
-            currentEvents: [],
+        },
+        controller: {
+            playing: false,
+            recording: false,
+            resetRecording: true
         },
         channels: [],
+        currentChannel: null,
         recordingOn: false,
         absTime: 0,
         channelColor: "#f2046d"
     }
     scheduledEvents = [];
-
+    currentInstrument = "acoustic_grand_piano"
     getChannelsEndTime = () => {
         let joinedEvents = []
 
@@ -50,66 +53,65 @@ class PianoControllerProvider extends React.Component {
             ...joinedEvents.map(event => event.time + event.duration),
         );
     };
-    getRecordingEndTime = () => {
-        const joinedEvents = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
-        if (joinedEvents.length === 0) {
-            return 0;
-        }
-        return Math.max(
-            ...joinedEvents.map(event => event.time + event.duration),
-        );
-    };
-
+    setController = (value) => {
+        this.setState({
+            controller: Object.assign({}, this.state.controller, value),
+        });
+    }
     setRecording = value => {
         this.setState({
             recordingPiano: Object.assign({}, this.state.recordingPiano, value),
         });
+        if (value.events)
+            this.addPianoToChannel(value)
     };
     setRecordingGrid = value => {
+
         this.setState({
             recordingGrid: Object.assign({}, this.state.recordingGrid, value),
         });
+        if (value.events) {
+            this.addGridToChannel(value.events)
+        }
     };
+    addGridToChannel = (notes) => {
+        let channel = this.state.channels.find(c => c.instrumentName === this.currentInstrument)
+        if (!channel) {
+            channel = new Channel(this.state.instrumentName)
+            this.onSubmitNewChannel(channel)
+        }
+        this.setState({
+            currentChannel: channel
+        })
+        channel.notes = notes
+        notes.forEach(n => {
 
-    onClickPlay = () => {
-        this.setRecording({
-            mode: 'PLAYING',
-        });
-        this.setRecordingGrid({
-            mode: "PLAYING"
+            channel.duration = Math.max(channel.duration, n.time + n.duration)
         })
 
-        const joinedEvents = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
-        const startAndEndTimes = _.uniq(
-            _.flatMap(joinedEvents, event => [
-                event.time,
-                event.time + event.duration,
-            ]),
-        );
-        startAndEndTimes.forEach((time, i) => {
-            this.scheduledEvents.push(
-                setTimeout(() => {
-                    const currentEvents = joinedEvents.filter(event => {
-                        return event.time <= time && event.time + event.duration > time
-                    });
-                    this.setRecording({
-                        currentEvents,
-                    });
-                }, time * 1000),
-            );
-        });
 
-        // Stop at the end
-        setTimeout(() => {
-            this.onFinish();
-        }, this.getRecordingEndTime() * 1000);
-    };
+    }
+    addPianoToChannel = (event) => {
+        let channel = this.state.channels.find(c => c.instrumentName === this.currentInstrument)
+        if (!channel) {
+            channel = new Channel(this.state.instrumentName)
+            this.onSubmitNewChannel(channel)
+        }
+        this.setState({
+            currentChannel: channel
+        })
+        channel.notes = event.events
+        channel.notes.forEach(n => {
+            channel.duration = Math.max(channel.duration ? channel.duration : 0, n.time + n.duration)
+        })
+
+    }
     playAllChannels = () => {
-        this.setRecording({
-            mode: 'PLAYING',
-        });
-        this.setRecordingGrid({
-            mode: "PLAYING"
+        //
+        this.setState({
+            controller: {
+                playing: true
+            }
         })
         this.props.playAll(this.state.channels)
         setTimeout(() => {
@@ -121,50 +123,48 @@ class PianoControllerProvider extends React.Component {
         this.scheduledEvents.forEach(scheduledEvent => {
             clearTimeout(scheduledEvent);
         });
-        this.setRecording({
-            mode: "NOT_RECORDING",
-            currentEvents: [],
-        });
-        this.setRecordingGrid({
-            mode: "NOT_PLAYING",
-            currentEvents: [],
-        });
-        // this.setState({
-        //     playing:false
-        // })
+        this.props.stopPlaying()
+        this.setState({
+            controller: {
+                playing: false
+            }
+        })
+
         this.setState({ recordingOn: false })
     };
     onFinish = () => {
         this.scheduledEvents.forEach(scheduledEvent => {
             clearTimeout(scheduledEvent);
         });
-        this.setRecording({
-            mode: "NOT_RECORDING",
-            currentEvents: [],
-        });
-        this.setRecordingGrid({
-            mode: "NOT_PLAYING",
-            currentEvents: [],
-        });
 
+        this.setState({
+            controller: {
+                playing: false
+            }
+        })
         this.setState({ recordingOn: false })
     }
     onClickClear = () => {
         this.onClickStop();
-        this.setRecording({
-            mode: "NOT_RECORDING",
-            events: [],
-            reset: true,
-            currentEvents: [],
-            currentTime: 0,
-        });
-        this.setRecordingGrid({
-            mode: "NOT_PLAYING",
-            events: [],
-            currentTime: 0,
-        });
+        const channel = this.state.channels.find(c => c.name == this.state.currentChannel.name)
+        if (!channel)
+            return
+        channel.notes = []
+        this.clearGrid()
+        this.clearPiano()
         this.setState({ recordingOn: false })
     };
+
+    clearGrid = () => {
+        this.setState({
+            recordingGrid: Object.assign({}, this.state.recordingPiano, { events: [], currentTime: 0 }),
+        });
+    }
+    clearPiano = () => {
+        this.setState({
+            recordingPiano: Object.assign({}, this.state.recordingPiano, { events: [], currentTime: 0 }),
+        });
+    }
 
     onClickUndo = () => {
         if (this.state.recordingPiano.events.length === 0) {
@@ -172,25 +172,25 @@ class PianoControllerProvider extends React.Component {
         }
         const eventsLength = this.state.recordingPiano.events.length
         const newEvents = this.state.recordingPiano.events.slice(0, eventsLength - 1)
-        this.setRecording({
-            mode: "NOT_RECORDING",
-            events: newEvents,
-            currentTime: newEvents[newEvents.length - 1].time + newEvents[newEvents.length - 1].duration
-        })
         this.setState({
-            recordingOn: false,
+            controller: {
+                recording: false
+            }
+        })
+        this.setRecording({
+            events: newEvents,
+            currentTime: newEvents.length > 0 ? newEvents[newEvents.length - 1].time + newEvents[newEvents.length - 1].duration : 0
         })
     }
     onClickSave = async () => {
-        const instrumentIndex = this.props.instrumentList.findIndex(i => i === this.state.instrumentName)
-        const blob = await saveMidi(this.state.recordingGrid.events, instrumentIndex)
-        var url  = window.URL.createObjectURL(blob);
+        const blob = await saveMidi(this.state.channels)
+        var url = window.URL.createObjectURL(blob);
         this.setState({
             url
         })
     }
-    clearLink=()=>{
-        this.setState({url:null})
+    clearLink = () => {
+        this.setState({ url: null })
     }
     onChangeFirstNote = (event) => {
         this.setState({
@@ -213,22 +213,31 @@ class PianoControllerProvider extends React.Component {
         this.setState({
             instrumentName: event.target.value,
         });
-
+        let channel = this.state.channels.find(c => c.instrumentName === event.target.value)
+        if (!channel) {
+            channel = new Channel(event.target.value)
+            this.onSubmitNewChannel(channel)
+        }
+        this.currentInstrument = event.target.value
+        this.props.loadChannelInstrument(event.target.value)
         this.props.loadInstrument(event.target.value)
+        this.clearGrid()
+        this.clearPiano()
+        this.setState({
+            currentChannel: channel
+        })
     };
 
     onSubmitNewChannel = (newChannel) => {
-        newChannel.notes = this.state.recordingPiano.events.concat(this.state.recordingGrid.events)
-        newChannel.instrumentName = this.state.instrumentName
-        this.props.loadChannelInstrument(this.state.instrumentName)
-        newChannel.duration = Math.max(this.state.recordingPiano.currentTime, this.state.recordingGrid.currentTime)
+        newChannel.instrumentName = newChannel.name
+        newChannel.duration = 0
         newChannel.color = this.state.channelColor
         const newChannelList = this.state.channels.concat(newChannel)
 
         this.setState({
             channels: newChannelList
         })
-        this.onClickClear()
+        this.props.loadChannelInstrument(this.state.instrumentName)
     }
     onRemoveChannel = (key) => {
         this.setState({
@@ -237,35 +246,34 @@ class PianoControllerProvider extends React.Component {
     }
     onSelectChannel = (key) => {
         const channel = this.state.channels[key]
-
-        this.state.channels.splice(key, 1)
-
+        this.setState({ instrumentName: channel.instrumentName })
+        this.currentInstrument = channel.instrumentName
         this.setRecordingGrid({
             events: channel.notes,
             currentTime: channel.duration,
         })
         this.props.loadInstrument(channel.instrumentName)
     }
+
     onClickReset = () => {
-        this.setRecording({
-            reset: true
+        this.setState({
+            controller: Object.assign({}, this.state.controller, { resetRecording: true })
         })
     }
     toggleRecording = (event, checked) => {
         if (checked) {
-            this.setRecording({
-                mode: 'RECORDING',
-            });
-
+            this.setState({
+                controller: Object.assign({}, this.state.controller, { recording: true })
+            })
             if (this.state.recordingPiano.events.length === 0)
                 this.setState({
                     absTime: Date.now()
                 })
         }
         else {
-            this.setRecording({
-                mode: 'NOT_RECORDING',
-            });
+            this.setState({
+                controller: Object.assign({}, this.state.controller, { recording: false })
+            })
         }
         this.setState({
             recordingOn: checked,
@@ -274,16 +282,23 @@ class PianoControllerProvider extends React.Component {
     }
 
     setColor = (color) => {
-        if (color)
+        if (color) {
             this.setState({
                 channelColor: color
             })
+            const channel = this.state.channels.find(c => c.instrumentName === this.state.instrumentName)
+            if (channel)
+                channel.color = color
+        }
     }
 
     render() {
         const propsToPass = {
-            url:this.state.url,
-            clearLink:this.clearLink,
+            url: this.state.url,
+            setController: this.setController,
+            controller: this.state.controller,
+            clearLink: this.clearLink,
+            currentChannel: this.state.currentChannel,
             absTime: this.state.absTime,
             toggleRecording: this.toggleRecording,
             onChangeInstrument: this.onChangeInstrument,

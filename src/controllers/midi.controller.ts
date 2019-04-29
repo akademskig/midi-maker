@@ -4,14 +4,12 @@ import Midi from "@tonejs/midi"
 import { Buffer } from "buffer";
 
 const addNew = async (req: Request, res: Response) => {
-    const { midiData, instrumentNumber, name } = req.body
-    const midi = encodeMidi(midiData, instrumentNumber)
-
+    const { midiData } = req.body
+    const midi = await encodeMidi(midiData)
     let filename = `${process.cwd()}/midis/${req.body.name.replace(/\s/g, "")}`
     fs.writeFileSync(filename + ".mid", Buffer.from(midi.toArray()))
-
     await converToMp3(filename)
-    res.sendFile(filename+".mp3")
+    res.sendFile(filename + ".mp3")
 }
 
 const converToMp3 = async (file: string) => {
@@ -30,21 +28,40 @@ const converToMp3 = async (file: string) => {
     })
 
 }
-const encodeMidi = (midiTrack: Array<any>, instrumentNumber: number) => {
+const encodeMidi = async (midiData: Array<any>) => {
     var midi = new Midi()
+    midiData.forEach(async (channel, i) => {
+        const iNum = await fetchInstrumentNumber(channel.instrumentName)
 
-    const track = midi.addTrack()
-    track.instrument.number = instrumentNumber
-    midiTrack.forEach(mt => {
-        track.addNote({
-            midi: mt.midiNumber,
-            time: mt.time,
-            duration: mt.duration
+        if (iNum == null) {
+            console.log(`Number not found for instrument ${channel.instrumentName}.`)
+            return
+        }
+        const track = midi.addTrack()
+        track.instrument.number = iNum
+        track.name = channel.instrumentName
+        track.channel = i
+
+        channel.notes.forEach((mt: any) => {
+            track.addNote({
+                midi: mt.midiNumber,
+                time: mt.time,
+                duration: mt.duration
+            })
         })
     })
     return midi
 }
 
+const fetchInstrumentNumber = async (instrument: string) => {
+    const formatted = instrument.split("_").map(i => i[0].toUpperCase() + i.substring(1, i.length)).join(" ")
+    let file = fs.readFileSync("./data/instrument_numbers.json").toString("utf8")
+    let json = JSON.parse(file)
+    for (let i = 0; i < json.instruments.length; i++) {
+        if (json.instruments[i].instrument.toLowerCase() === formatted.toLocaleLowerCase())
+            return i
+    }
+}
 export default {
     addNew
 }

@@ -1,25 +1,49 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Input, DialogContent, Card, CardHeader, CardContent, Typography, Icon, IconButton, Fab } from "@material-ui/core";
+import { Paper, Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Button, Modal, Drawer, IconButton } from "@material-ui/core";
+import { Settings, CloudDownload, Save, PlayArrow, StopRounded, ClearAll, UndoOutlined, FormatColorReset } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
-import AddIcon from '@material-ui/icons/Add';
 import AddChannelForm from "./AddChannelForm"
 import ColorPicker from 'material-ui-color-picker'
-import { Link, withRouter } from 'react-router-dom'
 const styles = theme => ({
     controllerGrid: {
         marginBottom: 0
     },
-    gridItem: {
-        overflow: "auto"
-    },
+
     controlPaper: {
         padding: theme.spacing.unit * 2,
         textAlign: 'left',
+
         color: theme.palette.text.secondary,
 
+    },
+    grid: {
+        width: "100%",
+        margin: 0,
+        padding: "20px",
+        display: "flex"
+    },
+    gridItem: {
+        display: "flex",
+    },
+    gridItemRow: {
+        display: "flex",
+        flexDirection: "row",
+        alignContent: "flex-start"
+
+    },
+    gridItemRight: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "flex-end"
+    },
+    icons: {
+        fontSize: "35px",
+    },
+    iconButton: {
+        marginRight: "1vw"
     },
     backgroundDiv: {
         padding: theme.spacing.unit * 2,
@@ -32,12 +56,16 @@ const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
         minWidth: 80,
+        color: "white"
+    },
+    formElements: {
+        color: "black"
     },
     buttons: {
         padding: "2px",
-        minWidth: "40px",
+        maxWidth: "150px",
+        minWidth: "100px",
         margin: "2px",
-        display: "inline-flex"
     },
     fab: {
         marginLeft: theme.spacing.unit,
@@ -58,7 +86,8 @@ class PianoController extends Component {
 
     state = {
         newChannelModal: false,
-        colorModal: false
+        colorModal: false,
+        openNav: false
     }
     onSubmitNewChannel = (channel) => {
         this.props.onSubmitNewChannel(channel)
@@ -80,13 +109,18 @@ class PianoController extends Component {
             newChannelModal: false
         })
     }
+    toggleDrawer = (open) => () => {
+        this.setState({
+            openNav: open,
+        });
+    };
+
 
     render() {
         const {
             url,
             clearLink,
             classes,
-            onClickPlay,
             onClickClear,
             onClickStop,
             onClickSave,
@@ -98,10 +132,8 @@ class PianoController extends Component {
             toggleRecording,
             recordingOn,
             onChangeInstrument,
-            recording,
             onClickReset,
             playAllChannels,
-            onClickAddChannel,
             channels,
             selectChannel,
             setColor,
@@ -112,93 +144,124 @@ class PianoController extends Component {
         }, {});
         return (
             <div>
-                <Paper className={classes.controlPaper} style={{ height: this.props.windowHeight }}>
-                    <Grid container spacing={24} className={classes.controllerGrid}>
-                        <Grid className={classes.gridItem} item xs={4}>
-                            <form className={classes.root} >
+                <Grid container spacing={24} className={classes.grid}>
+                    <Grid className={classes.gridItem} item xs={1}>
+                        <IconButton onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
 
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="first-note">Start Note</InputLabel>
-                                    <Select
-                                        value={noteRange.first}
-                                        name="first-note"
-                                        onChange={onChangeFirstNote}
-                                        inputProps={{
-                                            name: 'first-note',
-                                            id: 'first-note',
-                                        }}
-                                    >
-                                        {
-                                            MidiNumbers.NATURAL_MIDI_NUMBERS.map((midiNumber) =>
-                                                <MenuItem value={midiNumber} disabled={midiNumber >= noteRange.last} key={midiNumber}> {midiNumbersToNotes[midiNumber]}</MenuItem>
-                                            )}
-                                    </Select>
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel>End Note</InputLabel>
-                                    <Select
-                                        onChange={onChangeLastNote}
-                                        value={noteRange.last}>
-                                        {MidiNumbers.NATURAL_MIDI_NUMBERS.map((midiNumber) => (
-                                            <MenuItem value={midiNumber} disabled={midiNumber <= noteRange.first} key={midiNumber}> {midiNumbersToNotes[midiNumber]}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel>Instrument</InputLabel>
-                                    <Select
-                                        onChange={onChangeInstrument}
-                                        value={instrumentName}>
-                                        {instrumentList && instrumentList.map((value) => (
-                                            <MenuItem value={value} key={value}>
-                                                {value}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </form>
-                        </Grid>
-                        <Grid className={classes.gridItem} item xs={4}>
-                            <FormControlLabel
-                                label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
-                                control={<Switch
-                                    onChange={toggleRecording}
-                                    checked={recordingOn}
-                                    value={recordingOn}
-                                />}>
-                            </FormControlLabel>
-                            <div >
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickPlay}>Play</Button>
-                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickStop}>Stop</Button>
-                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickClear}>Clear</Button>
-                                <Button className={classes.buttons} variant="contained" color="secondary" onClick={onClickUndo}>Undo</Button>
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickSave}>Save</Button>
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={playAllChannels}>Play All</Button>
-                                <Button className={classes.buttons} variant="contained" color="primary" onClick={onClickReset}>Reset</Button>
-                            </div>
-                            {url?<a href={this.props.url} onClick={clearLink}download="file">Download</a>:null}
-                            <div></div>
-                            <div className="mt-5">
-                                <FormControl className={classes.formControl}>
-                                    <div className={classes.colorPicker}>
-                                        <ColorPicker
-                                            name='color'
-                                            defaultValue='#f2046d'
-                                            label="Channel Color"
-                                            // value={this.state.color} - for controlled component
-                                            onChange={setColor}
+                    </Grid>
+                    <Grid className={classes.gridItem} item xs={5}>
+                        <FormControlLabel
+                            label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
+                            control={<Switch
+                                onChange={toggleRecording}
+                                checked={recordingOn}
+                                value={recordingOn}
+                            />}>
 
-                                        />
-                                        {/* <Button style={{display:"block"}}onClick={this.closeColorPicker}>Close</Button> */}
-                                    </div>
-                                </FormControl>
-                            </div>
+                        </FormControlLabel>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickReset}>
+                                <FormatColorReset className={classes.icons}></FormatColorReset>
+                            </IconButton>
+                        </div>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
+                                <UndoOutlined className={classes.icons}>
+                                </UndoOutlined>
+                            </IconButton>
+                        </div>
+                        <div className="btn-row-1">
 
-                        </Grid>
-                        <Grid className={classes.gridItem} item xs={4}>
-                            <Fab color="primary" aria-label="Add" onClick={this.onClickAddChannel} className={classes.fab}>
-                                <AddIcon />
-                            </Fab>
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickClear}>
+                                <ClearAll className={classes.icons}></ClearAll>
+                            </IconButton>
+                        </div>
+                    </Grid>
+                    <Grid className={classes.gridItemRow} item xs={4}>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={playAllChannels}>
+                                <PlayArrow className={classes.icons}></PlayArrow>
+                            </IconButton>
+                        </div>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickStop}>
+                                <StopRounded className={classes.icons}></StopRounded>
+                            </IconButton>
+                        </div>
+                    </Grid>
+                    <Grid className={classes.gridItemRight} item xs={2}>
+                        <div className="btn-row-1">
+                            {url ? <a href={this.props.url} onClick={clearLink} download="file">
+                                <IconButton className={classes.iconButton} >
+                                    <CloudDownload className={classes.icons}></CloudDownload>
+                                </IconButton></a> : null}
+                        </div>
+                        <div className="btn-row-1">
+                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
+                                <Save className={classes.icons}></Save>
+                            </IconButton>
+                        </div>
+                    </Grid>
+                </Grid>
+                <Drawer open={this.state.openNav} onClose={this.toggleDrawer(false)}>
+                    <div className="ctrl-piano-config-bar">
+                        <div className="c-1 forms">
+                            <FormControl className={classes.formControl}>
+                                <InputLabel
+                                    htmlFor="first-note"
+                                    className={classes.formElements}
+
+                                >Start Note
+                                    </InputLabel>
+                                <Select
+                                    className={classes.formElements}
+                                    value={noteRange.first}
+                                    name="first-note"
+                                    onChange={onChangeFirstNote}
+                                    inputProps={{
+                                        name: 'first-note',
+                                        id: 'first-note',
+                                    }}
+                                >
+                                    {
+                                        MidiNumbers.NATURAL_MIDI_NUMBERS.map((midiNumber) =>
+                                            <MenuItem value={midiNumber} disabled={midiNumber >= noteRange.last} key={midiNumber}> {midiNumbersToNotes[midiNumber]}</MenuItem>
+                                        )}
+                                </Select>
+                            </FormControl>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel>End Note</InputLabel>
+                                <Select
+                                    onChange={onChangeLastNote}
+                                    value={noteRange.last}>
+                                    {MidiNumbers.NATURAL_MIDI_NUMBERS.map((midiNumber) => (
+                                        <MenuItem value={midiNumber} disabled={midiNumber <= noteRange.first} key={midiNumber}> {midiNumbersToNotes[midiNumber]}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel>Instrument</InputLabel>
+                                <Select
+                                    onChange={onChangeInstrument}
+                                    value={instrumentName}>
+                                    {instrumentList && instrumentList.map((value) => (
+                                        <MenuItem value={value} key={value}>
+                                            {value}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl className={classes.formControl}>
+                                <ColorPicker
+                                    name='color'
+                                    defaultValue='#f2046d'
+                                    label="Channel Color"
+                                    onChange={setColor}
+                                />
+                            </FormControl>
+                        </div>
+                        <div className="c-1 channels-list">
                             <ChannelsList channels={channels} selectChannel={selectChannel} removeChannel={this.removeChannel}></ChannelsList>
                             <Modal autoFocus={false} open={this.state.newChannelModal}>
                                 <AddChannelForm
@@ -208,9 +271,9 @@ class PianoController extends Component {
                                 >
                                 </AddChannelForm>
                             </Modal>
-                        </Grid>
-                    </Grid>
-                </Paper>
+                        </div>
+                    </div>
+                </Drawer>
             </div>
         )
     }
