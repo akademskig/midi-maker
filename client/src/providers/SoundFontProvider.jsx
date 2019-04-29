@@ -22,7 +22,7 @@ class SoundfontProvider extends React.Component {
         instrumentName: 'acoustic_grand_piano',
     };
     instruments = []
-
+    scheduledEvents = []
     constructor(props) {
         super(props);
         this.state = {
@@ -61,7 +61,6 @@ class SoundfontProvider extends React.Component {
         });
     };
     loadChannelInstrument = (instrumentName) => {
-
         return Soundfont.instrument(audioContext, instrumentName, {
             format: this.props.format,
             soundfont: this.props.soundfont,
@@ -74,10 +73,7 @@ class SoundfontProvider extends React.Component {
         });
     };
 
-
     playAll = async (channels) => {
-        //    console.log(channels)
-        //     await this.channelsToPlaylist(channels)
         let joinedEvents = []
         if (channels.length > 0) {
             channels.map(c => {
@@ -93,9 +89,8 @@ class SoundfontProvider extends React.Component {
                 event.time + event.duration,
             ]),
         );
-        const scheduledEvents = []
         startAndEndTimes.forEach((time, i) => {
-            scheduledEvents.push(
+            this.scheduledEvents.push(
                 setTimeout(() => {
                     const currentEvents = joinedEvents.filter(event => {
                         return event.time <= time && event.time + event.duration > time
@@ -111,11 +106,10 @@ class SoundfontProvider extends React.Component {
         channels.forEach(async c => {
             this.instruments[c.instrumentName] = await this.loadChannelInstrument(c.instrumentName)
         })
-
     }
     play = (midiNumber, duration, instrumentName) => {
         this.playNote(midiNumber, instrumentName)
-        window.setTimeout(() => {
+       window.setTimeout(() => {
             this.stopNote(midiNumber)
         }, duration * 1000)
     }
@@ -129,7 +123,12 @@ class SoundfontProvider extends React.Component {
             });
         });
     };
-
+    stopPlaying = () => {
+        this.scheduledEvents.forEach(se => {
+            clearTimeout(se)
+        })
+        this.stopAllNotes()
+    }
     stopNote = midiNumber => {
         audioContext.resume().then(() => {
             if (!this.state.activeAudioNodes[midiNumber]) {
@@ -164,6 +163,7 @@ class SoundfontProvider extends React.Component {
         const props = {
             isLoading: !this.state.instrument,
             playNote: this.playNote,
+            stopPlaying: this.stopPlaying,
             stopNote: this.stopNote,
             playAll: this.playAll,
             loadInstrument: this.loadInstrument,
@@ -175,14 +175,6 @@ class SoundfontProvider extends React.Component {
                 return React.cloneElement(child, { ...props });
             })
         )
-        // return this.props.render({
-        //     isLoading: !this.state.instrument,
-        //     playNote: this.playNote,
-        //     stopNote: this.stopNote,
-        //     playAll: this.playAll,
-        //     setInstrument: this.setInstrument,
-        //     stopAllNotes: this.stopAllNotes,
-        // });
     }
 }
 

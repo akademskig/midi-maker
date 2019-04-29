@@ -123,7 +123,7 @@ class PianoControllerProvider extends React.Component {
         this.scheduledEvents.forEach(scheduledEvent => {
             clearTimeout(scheduledEvent);
         });
-
+        this.props.stopPlaying()
         this.setState({
             controller: {
                 playing: false
