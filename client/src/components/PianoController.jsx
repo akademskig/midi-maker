@@ -166,11 +166,8 @@ class PianoController extends Component {
                         </div>
                         <div className="btn-row-1">
                             <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
-
                                 <UndoOutlined className={classes.icons}>
-
                                 </UndoOutlined>
-
                             </IconButton>
                         </div>
                         <div className="btn-row-1">
@@ -191,8 +188,6 @@ class PianoController extends Component {
                                 <StopRounded className={classes.icons}></StopRounded>
                             </IconButton>
                         </div>
-
-
                     </Grid>
                     <Grid className={classes.gridItemRight} item xs={2}>
                         <div className="btn-row-1">
@@ -200,15 +195,12 @@ class PianoController extends Component {
                                 <IconButton className={classes.iconButton} >
                                     <CloudDownload className={classes.icons}></CloudDownload>
                                 </IconButton></a> : null}
-
                         </div>
                         <div className="btn-row-1">
                             <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
                                 <Save className={classes.icons}></Save>
                             </IconButton>
                         </div>
-
-
                     </Grid>
                 </Grid>
                 <Drawer open={this.state.openNav} onClose={this.toggleDrawer(false)}>
