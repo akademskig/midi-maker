@@ -12,7 +12,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer"
-            style={{ height: this.props.height / 1.6+30, bottom: this.props.height / 5}}
+                style={{ height: this.props.height / 1.6 + 45, bottom: this.props.height / 5 }}
             >
 
                 <Canvas
@@ -92,7 +92,7 @@ class Canvas extends React.Component {
         let c = canvas.getContext("2d")
         canvas.width = (xLength * (RECT_WIDTH + RECT_SPACE))
         this.canvasWidth = canvas.width
-        canvas.height = this.props.canvasContainer.getBoundingClientRect().height -25
+        canvas.height = this.props.canvasContainer.getBoundingClientRect().height - 25
         RECT_HEIGHT = (canvas.height - RECT_SPACE * this.props.notes.length) / this.props.notes.length
         this.fontSize = RECT_HEIGHT * 0.8
         this.offsetFirst = this.fontSize
@@ -212,13 +212,13 @@ class Canvas extends React.Component {
     }
     showCoords = (event) => {
         var x = event.clientX + this.props.canvasContainer.scrollLeft
-        var y = event.clientY - (this.props.canvasContainer.getBoundingClientRect().top+10);
+        var y = event.clientY - (this.props.canvasContainer.getBoundingClientRect().top + 10);
         const rect = this.coordsMap.find(i =>
             (x >= i.x && x <= (i.x + RECT_WIDTH)) && (y >= i.y && y <= (i.y + RECT_HEIGHT))
         )
         if (!rect)
             return
-        if (rect.x >= this.props.canvasContainer.getBoundingClientRect().width - 200) {
+        if (rect.x >= this.props.canvasContainer) {
             this.props.canvasContainer.scroll(rect.x + 100, rect.y)
         }
 
