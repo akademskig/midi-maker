@@ -13,7 +13,6 @@ async function init() {
     const mongoDb = new Db(log)
 
     await webServer.init()
-    await mongoDb.init()
 }
 
 init()
