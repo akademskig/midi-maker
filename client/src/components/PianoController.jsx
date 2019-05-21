@@ -22,7 +22,6 @@ const styles = theme => ({
     grid: {
         width: "100%",
         margin: 0,
-        padding: "20px",
         display: "flex"
     },
     gridItem: {
