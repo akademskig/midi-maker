@@ -12,7 +12,7 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer"
-                style={{ height: this.props.height / 1.6 + 45, bottom: this.props.height / 5 }}
+                style={{ height: this.props.height - this.props.height / 5 - 83, bottom: this.props.height / 5 }}
             >
 
                 <Canvas
@@ -274,7 +274,7 @@ class Canvas extends React.Component {
         if (!newProps.controller.playing && this.props.controller.playing)
             this.stop()
 
-        if ((!this.props.controller.recording && newProps.controller.recording) && newProps.controller.resetRecording) {
+        if ((!this.props.controller.recording && newProps.controller.recording) && (this.props.controller.resetRecording)) {
             this.showRecordingBar()
             this.props.setController({
                 resetRecording: false
