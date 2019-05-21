@@ -258,6 +258,9 @@ class PianoControllerProvider extends React.Component {
         this.setState({
             controller: Object.assign({}, this.state.controller, { resetRecording: true })
         })
+        this.setRecording({
+            currentTime: 0,
+        })
     }
     toggleRecording = (event, checked) => {
         if (checked) {
@@ -308,6 +311,7 @@ class PianoControllerProvider extends React.Component {
             onClickSave: this.onClickSave,
             onClickStop: this.onClickStop,
             onClickUndo: this.onClickUndo,
+            onClickReset:this.onClickReset,
             noteRange: this.state.noteRange,
             recordingOn: this.state.recordingOn,
             recording: this.state.recordingPiano,
