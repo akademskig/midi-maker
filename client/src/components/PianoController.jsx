@@ -152,11 +152,12 @@ class PianoController extends Component {
                 <Grid container spacing={24} className={classes.grid}>
                     <Grid className={classes.gridItem} item xs={1}>
                         <div className="btn-row-1">
-                            <IconButton onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
+                            <IconButton title="Piano settings" onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
                         </div>
                     </Grid>
                     <Grid className={classes.gridItemRow} item xs={2}>
                         <FormControlLabel
+                            title="Record"
                             label={"REC"}
                             control={<Switch
                                 onChange={toggleRecording}
@@ -166,33 +167,33 @@ class PianoController extends Component {
 
                         </FormControlLabel>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickReset}>
+                            <IconButton title="Reset recording" className={classes.iconButton} variant="contained" color="primary" onClick={onClickReset}>
                                 <SettingsBackupRestoreRounded className={classes.icons}></SettingsBackupRestoreRounded>
                             </IconButton>
                         </div>
                     </Grid>
                     <Grid className={classes.gridItemRow} item xs={3}>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
+                            <IconButton title="Undo" className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
                                 <UndoOutlined className={classes.icons}>
                                 </UndoOutlined>
                             </IconButton>
                         </div>
                         <div className="btn-row-1">
 
-                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickClear}>
+                            <IconButton title="Clear notes" className={classes.iconButton} variant="contained" color="secondary" onClick={onClickClear}>
                                 <Clear className={classes.icons}></Clear>
                             </IconButton>
                         </div>
                     </Grid>
                     <Grid className={classes.gridItemRow} item xs={4}>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButtonBlue} variant="contained" onClick={playAllChannels}>
+                            <IconButton title="Play" className={classes.iconButtonBlue} variant="contained" onClick={playAllChannels}>
                                 <PlayArrow className={classes.icons}></PlayArrow>
                             </IconButton>
                         </div>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickStop}>
+                            <IconButton title="Stop" className={classes.iconButton} variant="contained" color="secondary" onClick={onClickStop}>
                                 <StopRounded className={classes.icons}></StopRounded>
                             </IconButton>
                         </div>
@@ -200,12 +201,12 @@ class PianoController extends Component {
                     <Grid className={classes.gridItemRight} item xs={2}>
                         <div className="btn-row-1">
                             {url ? <a href={this.props.url} onClick={clearLink} download="file">
-                                <IconButton className={classes.iconButtonBlue} >
+                                <IconButton title="Download" className={classes.iconButtonBlue} >
                                     <CloudDownload className={classes.icons}></CloudDownload>
                                 </IconButton></a> : null}
                         </div>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
+                            <IconButton title="Save" className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
                                 <Save className={classes.icons}></Save>
                             </IconButton>
                         </div>
