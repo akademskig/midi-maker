@@ -56,14 +56,14 @@ $light-blue: rgb(71, 178, 228);
   .config-bar-title {
     color: black;
     display: flex;
-    padding: 0 35px 0 15px;
+    padding: 0 32px 0 15px;
     align-items: center;
     border-bottom: 1px solid #efefef;
 
     p {
       text-align: center;
       width: 100%;
-
+      margin-left: 5px;
     }
   }
 
