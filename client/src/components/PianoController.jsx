@@ -90,18 +90,20 @@ const styles = theme => ({
 class PianoController extends Component {
 
     state = {
-        newChannelModal: false,
+        saveMidiModal: false,
         colorModal: false,
-        openNav: false
+        openNav: false,
+        filename: "filename"
     }
-    onSubmitNewChannel = (channel) => {
-        this.props.onSubmitNewChannel(channel)
+    onMidiSave = (filename) => {
         this.setState({
-            newChannelModal: false
+            saveMidiModal: false,
+            filename
         })
+        this.props.onClickSave(filename)
     }
-    onClickAddChannel = () => {
-        this.setState({ newChannelModal: true })
+    onClickSave = () => {
+        this.setState({ saveMidiModal: true })
     }
     openColorModal = () => {
         this.setState({ colorModal: true })
@@ -128,7 +130,6 @@ class PianoController extends Component {
             classes,
             onClickClear,
             onClickStop,
-            onClickSave,
             onClickUndo,
             onChangeFirstNote,
             onChangeLastNote,
@@ -200,16 +201,23 @@ class PianoController extends Component {
                     </Grid>
                     <Grid className={classes.gridItemRight} item xs={2}>
                         <div className="btn-row-1">
-                            {url ? <a href={this.props.url} onClick={clearLink} download="file">
+                            {url ? <a href={this.props.url} onClick={clearLink} download={this.state.filename}>
                                 <IconButton title="Download" className={classes.iconButtonBlue} >
                                     <CloudDownload className={classes.icons}></CloudDownload>
                                 </IconButton></a> : null}
                         </div>
                         <div className="btn-row-1">
-                            <IconButton title="Save" className={classes.iconButton} variant="contained" color="primary" onClick={onClickSave}>
+                            <IconButton title="Save" className={classes.iconButton} variant="contained" color="primary" onClick={this.onClickSave}>
                                 <Save className={classes.icons}></Save>
                             </IconButton>
                         </div>
+                        <Modal autoFocus={false} open={this.state.saveMidiModal}>
+                            <AddChannelForm
+                                onMidiSave={this.onMidiSave}
+                                onCancel={this.onCancel}
+                            >
+                            </AddChannelForm>
+                        </Modal>
                     </Grid>
                 </Grid>
                 <Drawer open={this.state.openNav} onClose={this.toggleDrawer(false)}>
@@ -272,14 +280,7 @@ class PianoController extends Component {
                         </div>
                         <div className="c-1 channels-list">
                             <ChannelsList channels={channels} selectChannel={selectChannel} removeChannel={this.removeChannel}></ChannelsList>
-                            <Modal autoFocus={false} open={this.state.newChannelModal}>
-                                <AddChannelForm
-                                    instrumentList={instrumentList}
-                                    onSubmitNewChannel={this.onSubmitNewChannel}
-                                    onCancel={this.onCancel}
-                                >
-                                </AddChannelForm>
-                            </Modal>
+
                         </div>
                     </div>
                 </Drawer>

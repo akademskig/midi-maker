@@ -181,8 +181,8 @@ class PianoControllerProvider extends React.Component {
             currentTime: newEvents.length > 0 ? newEvents[newEvents.length - 1].time + newEvents[newEvents.length - 1].duration : 0
         })
     }
-    onClickSave = async () => {
-        const blob = await saveMidi(this.state.channels)
+    onClickSave = async (filename) => {
+        const blob = await saveMidi(this.state.channels, filename)
         var url = window.URL.createObjectURL(blob);
         this.setState({
             url

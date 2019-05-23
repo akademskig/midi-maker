@@ -20,30 +20,29 @@ const styles = theme => ({
 });
 class AddChannelForm extends Component {
     state = {
-        channelName: "",
-        instrument: ""
+        filename: "file-1",
+        error: false
     }
 
-    onChannelNameChange = (e) => {
+    onMidiNameChange = (e) => {
+        if (!this.validateMidiName(e.target.value)) {
+            this.setState({ error: true })
+        } else {
+            this.setState({ error: false })
+        }
         this.setState({
-            channelName: e.target.value
-        })
-    }
-    onInstrumentChange = (e) => {
-        this.setState({
-            instrument: e.target.value
+            filename: e.target.value
         })
     }
 
-    onSubmitNewChannel = () => {
-        const channel = new Channel(this.state.channelName, this.state.instrument)
-        this.props.onSubmitNewChannel(channel)
+    onMidiSave = () => {
+        this.props.onMidiSave(this.state.filename)
     }
     onCancel = () => {
         this.props.onCancel()
     }
-    validateChannel = (text) => {
-        return !text.length > 0
+    validateMidiName = (text) => {
+        return text.length > 0
     }
     render() {
         const { classes } = this.props
@@ -51,17 +50,17 @@ class AddChannelForm extends Component {
             <DialogContent>
                 <Paper className={classes.addChannelPaper}>
                     <form required={true} className={classes.formControl}
-                        onSubmit={this.onSubmitNewChannel}
+                        onSubmit={this.onMidiSave}
                     >
                         <TextField className={classes.textField}
-                            error={this.validateChannel(this.state.channelName) ? true : false}
+                            error={this.state.error}
                             label="Name"
                             variant="outlined"
                             required
-                            placeholder="channel-0"
+                            placeholder="filename"
                             autoFocus
-                            onChange={this.onChannelNameChange}
-                            value={this.state.channelName}
+                            onChange={this.onMidiNameChange}
+                            value={this.state.filename}
                         >
                         </TextField>
                         <Button className={classes.button} type="submit">OK</Button>
@@ -74,14 +73,4 @@ class AddChannelForm extends Component {
 }
 export default withStyles(styles)(AddChannelForm)
 
-class Channel {
-    name = ""
-    instrument = ""
-    notes = []
-    duration = 0
-    instrumentName = ""
-    color = ""
-    constructor(name) {
-        this.name = name
-    }
-}
+

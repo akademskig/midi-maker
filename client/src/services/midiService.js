@@ -4,9 +4,9 @@ import {
 
 const apiUrl = `${window.location.protocol}//${window.location.hostname}:${config.PORT}`
 
-export const saveMidi = (midiData) => {
+export const saveMidi = (midiData, filename) => {
     const midiBody = {
-        name: "test2",
+        name: filename,
         midiData
     }
     return fetch(`${apiUrl}/midis/save`, {
@@ -19,6 +19,6 @@ export const saveMidi = (midiData) => {
     }).then((response) => {
         return response.blob()
     }).catch((err) => {
-        console.log(err)
+        console.err(err)
     })
 }
