@@ -12,9 +12,8 @@ class NotesGrid extends React.Component {
         const canvasContainer = this.refs.canvasContainer
         return (
             <div ref="canvasContainer" className="gridContainer"
-                style={{ height: this.props.height - this.props.height / 5 - 83, bottom: this.props.height / 5 }}
+                style={{ height: this.props.height - this.props.height / 5 - 82, bottom: this.props.height / 5 }}
             >
-
                 <Canvas
                     controller={this.props.controller}
                     setController={this.props.setController}
@@ -34,7 +33,7 @@ class NotesGrid extends React.Component {
                     channels={this.props.channels}
                     currentChannel={this.props.currentChannel}
                 >
-                </Canvas>)}>
+                </Canvas>
             </div>
         )
     }

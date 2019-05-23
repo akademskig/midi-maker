@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
 import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton } from "@material-ui/core";
-import { Settings, CloudDownload, Save, PlayArrow, StopRounded, ClearAll, UndoOutlined, FormatColorReset } from '@material-ui/icons';
+import { Settings, CloudDownload, Save, PlayArrow, StopRounded, UndoOutlined, SettingsBackupRestoreRounded, Clear } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
@@ -26,6 +26,7 @@ const styles = theme => ({
     },
     gridItem: {
         display: "flex",
+        alignItems: "center"
     },
     gridItemRow: {
         display: "flex",
@@ -39,10 +40,15 @@ const styles = theme => ({
         justifyContent: "flex-end"
     },
     icons: {
-        fontSize: "35px",
+        fontSize: "30px",
     },
     iconButton: {
-        marginRight: "1vw"
+        marginRight: "1vw",
+    },
+    iconButtonBlue: {
+        marginRight: "1vw",
+        color: "rgb(71, 178, 228);"
+
     },
     backgroundDiv: {
         padding: theme.spacing.unit * 2,
@@ -145,12 +151,13 @@ class PianoController extends Component {
             <div>
                 <Grid container spacing={24} className={classes.grid}>
                     <Grid className={classes.gridItem} item xs={1}>
-                        <IconButton onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
-
+                        <div className="btn-row-1">
+                            <IconButton onClick={this.toggleDrawer(true)} ><Settings></Settings> </IconButton>
+                        </div>
                     </Grid>
-                    <Grid className={classes.gridItem} item xs={5}>
+                    <Grid className={classes.gridItemRow} item xs={2}>
                         <FormControlLabel
-                            label={!recordingOn ? "START RECORDING" : "STOP RECORDING"}
+                            label={"REC"}
                             control={<Switch
                                 onChange={toggleRecording}
                                 checked={recordingOn}
@@ -160,9 +167,11 @@ class PianoController extends Component {
                         </FormControlLabel>
                         <div className="btn-row-1">
                             <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={onClickReset}>
-                                <FormatColorReset className={classes.icons}></FormatColorReset>
+                                <SettingsBackupRestoreRounded className={classes.icons}></SettingsBackupRestoreRounded>
                             </IconButton>
                         </div>
+                    </Grid>
+                    <Grid className={classes.gridItemRow} item xs={3}>
                         <div className="btn-row-1">
                             <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickUndo}>
                                 <UndoOutlined className={classes.icons}>
@@ -172,13 +181,13 @@ class PianoController extends Component {
                         <div className="btn-row-1">
 
                             <IconButton className={classes.iconButton} variant="contained" color="secondary" onClick={onClickClear}>
-                                <ClearAll className={classes.icons}></ClearAll>
+                                <Clear className={classes.icons}></Clear>
                             </IconButton>
                         </div>
                     </Grid>
                     <Grid className={classes.gridItemRow} item xs={4}>
                         <div className="btn-row-1">
-                            <IconButton className={classes.iconButton} variant="contained" color="primary" onClick={playAllChannels}>
+                            <IconButton className={classes.iconButtonBlue} variant="contained" onClick={playAllChannels}>
                                 <PlayArrow className={classes.icons}></PlayArrow>
                             </IconButton>
                         </div>
@@ -191,7 +200,7 @@ class PianoController extends Component {
                     <Grid className={classes.gridItemRight} item xs={2}>
                         <div className="btn-row-1">
                             {url ? <a href={this.props.url} onClick={clearLink} download="file">
-                                <IconButton className={classes.iconButton} >
+                                <IconButton className={classes.iconButtonBlue} >
                                     <CloudDownload className={classes.icons}></CloudDownload>
                                 </IconButton></a> : null}
                         </div>

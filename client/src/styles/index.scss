@@ -7,15 +7,15 @@
 
 .gridContainer {
   display: flex;
-  padding: 2px 0;
-  overflow-x: auto;
+  overflow-x: scroll;
+  align-items: center;
+  padding-top: 5px;
   overflow-y: hidden;
   background: black;
   align-items: center;
 
   div {
     text-align: center;
-    margin: auto;
   }
 }
 
@@ -25,7 +25,8 @@
 
 ::-webkit-scrollbar {
   /* remove scrollbar space */
-  background: white;
+  padding: 5px;
+  background: black;
   width: 5px;
   height: 10px;
   /* optional: just make scrollbar invisible */
@@ -33,13 +34,14 @@
 
 ::-webkit-scrollbar-thumb {
   width: 5px;
-  background: rgb(65, 65, 131);
+  background: rgb(71, 178, 228);
   border-radius: 4px;
 }
 
 .btn-row-1 {
   max-width: 250px;
 }
+
 
 .ctrl-piano-config-bar {
   width: 250px;
