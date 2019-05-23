@@ -222,6 +222,10 @@ class PianoController extends Component {
                 </Grid>
                 <Drawer open={this.state.openNav} onClose={this.toggleDrawer(false)}>
                     <div className="ctrl-piano-config-bar">
+                        <div className="config-bar-title">
+                            <Settings></Settings>
+                            <p>PIANO/GRID SETTINGS</p>
+                        </div>
                         <div className="c-1 forms">
                             <FormControl className={classes.formControl}>
                                 <InputLabel

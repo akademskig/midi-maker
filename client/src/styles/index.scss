@@ -1,4 +1,4 @@
-@theme-blue: blue;
+$light-blue: rgb(71, 178, 228);
 
 #root {
   background-color: white;
@@ -49,6 +49,24 @@
   z-index: 1000;
   color: white;
 
+  input {
+    border-bottom-color: #efefef;
+  }
+
+  .config-bar-title {
+    color: black;
+    display: flex;
+    padding: 0 35px 0 15px;
+    align-items: center;
+    border-bottom: 1px solid #efefef;
+
+    p {
+      text-align: center;
+      width: 100%;
+
+    }
+  }
+
   #select-container {
     display: block;
     position: relative;
@@ -61,6 +79,16 @@
     margin: 5px;
     padding: 3px;
 
+    &.channels-list {
+      border-top: solid 1px #efefef;
+      margin: 0;
+      padding: 8px;
+      padding-top: 15px;
+    }
+
+    &.forms {
+      margin-bottom: 20px;
+    }
   }
 
   .c-2 {
