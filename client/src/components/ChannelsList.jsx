@@ -16,7 +16,8 @@ const styles = theme => ({
     button: {
         float: "right",
         padding:0,
-        right:0
+        right:0,
+        color:"white"
     }
 })
 

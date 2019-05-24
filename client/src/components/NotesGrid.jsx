@@ -72,6 +72,7 @@ class Canvas extends React.Component {
 
     }
     timerList = []
+    time = 0
     drawInitial = (canvas, timer, playAll) => {
         let joinedEvents = []
         if (this.props.channels.length > 0) {
@@ -85,8 +86,7 @@ class Canvas extends React.Component {
         this.maxTime = this.time
         if (this.props.controller.recording && timer)
             this.time = timer
-        else if (!this.time)
-            this.time = 4
+
         let xLength = (this.time * this.state.rectTime) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.time * this.state.rectTime + 5
         let c = canvas.getContext("2d")
         canvas.width = (xLength * (RECT_WIDTH + RECT_SPACE))
@@ -151,8 +151,6 @@ class Canvas extends React.Component {
             c.fillStyle = this.props.controller.playing ? BAR_COLOR : RECORDING_BAR_COLOR
             c.fillRect(this.lastRect, 0, BAR_WIDTH, canvas.height)
         }
-
-
     }
 
     play = () => {
@@ -280,7 +278,6 @@ class Canvas extends React.Component {
             })
         if (!newProps.controller.playing && this.props.controller.playing)
             this.stop()
-
         if ((!this.props.controller.recording && newProps.controller.recording) && (this.props.controller.resetRecording)) {
             this.showRecordingBar()
             this.props.setController({

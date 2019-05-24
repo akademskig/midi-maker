@@ -69,7 +69,7 @@ class AddChannelForm extends Component {
                         >
                         </TextField>
                         <div className="form-buttons">
-                            <Button className={classes.buttonLeft} type="submit">OK</Button>
+                            <Button className={classes.buttonLeft} type="submit">Save & Download</Button>
                             <Button className={classes.buttonRight} onClick={this.onCancel}>Cancel</Button>
                         </div>
                     </form>

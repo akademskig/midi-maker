@@ -31,7 +31,7 @@ class PianoControllerProvider extends React.Component {
         recordingOn: false,
         absTime: 0,
         channelColor: "#f2046d",
-        noteDuration: 0.5
+        noteDuration: 0.2
     }
     scheduledEvents = [];
     currentInstrument = "acoustic_grand_piano"
@@ -88,8 +88,6 @@ class PianoControllerProvider extends React.Component {
 
             channel.duration = Math.max(channel.duration, n.time + n.duration)
         })
-
-
     }
     addPianoToChannel = (event) => {
         let channel = this.state.channels.find(c => c.instrumentName === this.currentInstrument)
@@ -107,15 +105,14 @@ class PianoControllerProvider extends React.Component {
 
     }
     playAllChannels = () => {
-        //
-        this.setState({
-            controller: {
-                playing: true
-            }
+        if (this.state.controller.playing)
+            return
+        this.setController({
+            playing:true
         })
         this.props.playAll(this.state.channels)
         setTimeout(() => {
-            this.onFinish();
+            this.onClickStop();
         }, this.getChannelsEndTime() * 1000);
     }
 
@@ -124,26 +121,22 @@ class PianoControllerProvider extends React.Component {
             clearTimeout(scheduledEvent);
         });
         this.props.stopPlaying()
-        this.setState({
-            controller: {
-                playing: false
-            }
+        this.setController({
+            playing:false
         })
-
-        this.setState({ recordingOn: false })
     };
-    onFinish = () => {
-        this.scheduledEvents.forEach(scheduledEvent => {
-            clearTimeout(scheduledEvent);
-        });
+    // onFinish = () => {
+    //     this.scheduledEvents.forEach(scheduledEvent => {
+    //         clearTimeout(scheduledEvent);
+    //     });
 
-        this.setState({
-            controller: {
-                playing: false
-            }
-        })
-        this.setState({ recordingOn: false })
-    }
+    //     this.setState({
+    //         controller: {
+    //             playing: false
+    //         }
+    //     })
+    //     this.setState({ recordingOn: false })
+    // }
     onClickClear = () => {
         this.onClickStop();
         const channel = this.state.channels.find(c => c.name === this.state.currentChannel.name)
@@ -240,6 +233,7 @@ class PianoControllerProvider extends React.Component {
         this.props.loadChannelInstrument(this.state.instrumentName)
     }
     onRemoveChannel = (key) => {
+        this.onClickClear()
         this.setState({
             channels: this.state.channels.filter((c, i) => i !== key)
         })
@@ -295,8 +289,8 @@ class PianoControllerProvider extends React.Component {
         }
     }
 
-    onChangeNoteDuration=($e)=>{
-        let duration= parseFloat($e.target.value)
+    onChangeNoteDuration = ($e) => {
+        let duration = parseFloat($e.target.value)
         this.setState({
             noteDuration: duration
         })
@@ -318,7 +312,7 @@ class PianoControllerProvider extends React.Component {
             onClickSave: this.onClickSave,
             onClickStop: this.onClickStop,
             onClickUndo: this.onClickUndo,
-            onClickReset:this.onClickReset,
+            onClickReset: this.onClickReset,
             noteRange: this.state.noteRange,
             recordingOn: this.state.recordingOn,
             recording: this.state.recordingPiano,
