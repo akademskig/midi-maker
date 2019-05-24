@@ -32,6 +32,7 @@ class NotesGrid extends React.Component {
                     setRecordingGrid={this.props.setRecordingGrid}
                     channels={this.props.channels}
                     currentChannel={this.props.currentChannel}
+                    noteDuration={this.props.noteDuration}
                 >
                 </Canvas>
             </div>
@@ -50,7 +51,7 @@ const RECT_COLOR = "rgba(4,32,55,1)"
 // const FIRST_RECT_COLOR = "rgb(255,255,255)"
 // const NOTE_COLOR = "#61dafb"
 // const START_TIME = window.innerWidth / (RECT_WIDTH + RECT_SPACE)
-const RECT_TIME = 2
+const RECT_TIME = 5
 const BAR_COLOR = "#d13a1f"
 const RECORDING_BAR_COLOR = "#a0cf33"
 const BAR_WIDTH = 4
@@ -69,10 +70,12 @@ class Canvas extends React.Component {
     state = {
         playing: false,
         timesRemained: [],
-        channelColor: "#f2046d"
+        channelColor: "#f2046d",
+        rectTime: 1 / this.props.noteDuration || RECT_TIME
     }
 
     drawInitial = (canvas, timer, playAll) => {
+        console.log(this.state.rectTime)
         let joinedEvents = []
         if (this.props.channels.length > 0) {
             this.props.channels.forEach(c => {
@@ -87,7 +90,7 @@ class Canvas extends React.Component {
             this.time = timer
         else if (!this.time)
             this.time = 4
-        let xLength = (this.time * RECT_TIME) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.time * RECT_TIME + 5
+        let xLength = (this.time * this.state.rectTime) + 5 < window.innerWidth / (RECT_WIDTH + RECT_SPACE) ? window.innerWidth / (RECT_WIDTH + RECT_SPACE) : this.time * this.state.rectTime + 5
         let c = canvas.getContext("2d")
         canvas.width = (xLength * (RECT_WIDTH + RECT_SPACE))
         this.canvasWidth = canvas.width
@@ -114,9 +117,9 @@ class Canvas extends React.Component {
         });
         if (joinedEvents.length > 0) {
             joinedEvents.forEach((n, i) => {
-                const x = RECT_WIDTH + Math.floor(n.time * RECT_WIDTH * RECT_TIME) + this.offsetFirst
+                const x = RECT_WIDTH + Math.floor(n.time * RECT_WIDTH * this.state.rectTime) + this.offsetFirst
                 const y = Math.floor(canvas.height - ((n.midiNumber - this.props.midiOffset) * RECT_HEIGHT + RECT_SPACE * (n.midiNumber - this.props.midiOffset))) - (RECT_HEIGHT + RECT_SPACE)
-                const width = Math.floor(n.duration * RECT_WIDTH * RECT_TIME)
+                const width = Math.floor(n.duration * RECT_WIDTH * this.state.rectTime)
                 c.fillStyle = n.color ? n.color : this.state.channelColor
                 c.clearRect(x, y, width, RECT_HEIGHT);
                 c.fillRect(x, y, width, RECT_HEIGHT);
@@ -129,7 +132,7 @@ class Canvas extends React.Component {
             c.fillRect(eventRect.x, eventRect.y, RECT_WIDTH, RECT_HEIGHT);
         })
         if (timer) {
-            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * RECT_TIME) + this.offsetFirst
+            const x = RECT_WIDTH + Math.floor(timer * RECT_WIDTH * this.state.rectTime) + this.offsetFirst
             c.fillStyle = this.props.controller.recording ? RECORDING_BAR_COLOR : BAR_COLOR
             c.fillStyle = this.props.controller.playing ? BAR_COLOR : RECORDING_BAR_COLOR
             c.clearRect(x, 0, BAR_WIDTH, canvas.height)
@@ -151,7 +154,7 @@ class Canvas extends React.Component {
         if (this.props.controller.playing)
             return
         const canvas = this.refs.canvas
-        for (let i = 0; i < this.maxTime; i += 0.05) {
+        for (let i = 0; i < this.maxTime; i += 0.05 / this.state.rectTime) {
             let t = window.setTimeout(() => {
                 let count = i
                 this.drawInitial(canvas, count)
@@ -164,7 +167,7 @@ class Canvas extends React.Component {
     showRecordingBar = () => {
         const timesRemained = []
         const canvas = this.refs.canvas
-        for (let i = 0; i < REC_TIME; i += 0.05) {
+        for (let i = 0; i < REC_TIME; i += 0.05 / this.state.rectTime) {
             timesRemained.push(i)
             let t = window.setTimeout(() => {
                 this.drawInitial(canvas, i)
@@ -223,8 +226,8 @@ class Canvas extends React.Component {
 
         const lastEvent = {
             midiNumber: rect.midiNumber,
-            time: (rect.x - (RECT_WIDTH) - this.offsetFirst) / RECT_WIDTH / RECT_TIME,
-            duration: 1 / RECT_TIME
+            time: (rect.x - (RECT_WIDTH) - this.offsetFirst) / RECT_WIDTH / this.state.rectTime,
+            duration: 1 / this.state.rectTime
         }
         if (!this.props.currentChannel || this.props.currentChannel.notes.findIndex(e => _.isEqual(e.midiNumber, lastEvent.midiNumber) && e.time === lastEvent.time) === -1) {
             this.playNote(lastEvent)
@@ -246,7 +249,7 @@ class Canvas extends React.Component {
                 this.props.setRecordingGrid({
                     events: this.props.currentChannel.notes,
                     currentTime: (lastEvent.time + lastEvent.duration) >= this.props.recordingGrid.currentTime ?
-                        lastTime + 1 / RECT_TIME : this.props.recordingGrid.currentTime
+                        lastTime + 1 / this.state.rectTime : this.props.recordingGrid.currentTime
                 })
             }
         }
@@ -286,6 +289,11 @@ class Canvas extends React.Component {
         }
         if (!this.props.controller.resetRecording && newProps.controller.resetRecording) {
             this.stopRecordingBar(false); this.resetRec()
+        }
+        if (this.props.noteDuration !== newProps.noteDuration) {
+            this.setState({
+                rectTime: 1 / newProps.noteDuration
+            })
         }
     }
     componentDidUpdate() {

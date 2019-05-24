@@ -30,7 +30,8 @@ class PianoControllerProvider extends React.Component {
         currentChannel: null,
         recordingOn: false,
         absTime: 0,
-        channelColor: "#f2046d"
+        channelColor: "#f2046d",
+        noteDuration: 0.5
     }
     scheduledEvents = [];
     currentInstrument = "acoustic_grand_piano"
@@ -294,6 +295,12 @@ class PianoControllerProvider extends React.Component {
         }
     }
 
+    onChangeNoteDuration=($e)=>{
+        let duration= $e.target.value
+        this.setState({
+            noteDuration: duration
+        })
+    }
     render() {
         const propsToPass = {
             url: this.state.url,
@@ -327,7 +334,9 @@ class PianoControllerProvider extends React.Component {
             onRemoveChannel: this.onRemoveChannel,
             onCancel: this.onCancel,
             selectChannel: this.onSelectChannel,
-            setColor: this.setColor
+            setColor: this.setColor,
+            noteDuration: this.state.noteDuration,
+            onChangeDuration: this.onChangeNoteDuration
         }
         return (
             React.Children.map(this.props.children, (child) => {

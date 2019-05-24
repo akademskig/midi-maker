@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton } from "@material-ui/core";
-import { Settings, CloudDownload, Save, PlayArrow, StopRounded, UndoOutlined, SettingsBackupRestoreRounded, Clear } from '@material-ui/icons';
+import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton, InputBase, Input } from "@material-ui/core";
+import { Settings, CloudDownload, Save, PlayArrow, StopRounded, UndoOutlined, SettingsBackupRestoreRounded, Clear, InputRounded } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
@@ -143,6 +143,8 @@ class PianoController extends Component {
             channels,
             selectChannel,
             setColor,
+            noteDuration,
+            onChangeDuration,
             noteRange } = this.props;
         const midiNumbersToNotes = MidiNumbers.NATURAL_MIDI_NUMBERS.reduce((obj, midiNumber) => {
             obj[midiNumber] = MidiNumbers.getAttributes(midiNumber).note;
@@ -271,6 +273,18 @@ class PianoController extends Component {
                                         </MenuItem>
                                     ))}
                                 </Select>
+                            </FormControl>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel>Note Duration (seconds)</InputLabel>
+                                <Input
+                                    type="number"
+                                    value={noteDuration}
+                                    onChange={onChangeDuration.bind(this)}
+                                    inputProps={{
+                                        min: 0.1,
+                                        step: 0.1
+                                    }}
+                                ></Input>
                             </FormControl>
 
                             <FormControl className={classes.formControl}>
