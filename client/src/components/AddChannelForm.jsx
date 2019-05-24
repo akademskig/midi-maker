@@ -14,8 +14,13 @@ const styles = theme => ({
         minWidth: "120px",
         padding: "10px"
     },
-    button: {
-        margin: "10px"
+    buttonLeft: {
+        marginTop: "10px",
+        backgroundColor: " rgb(71, 178, 228);"
+    },
+    buttonRight: {
+        marginTop: "10px",
+        backgroundColor: "#EC6F66"
     }
 });
 class AddChannelForm extends Component {
@@ -63,8 +68,10 @@ class AddChannelForm extends Component {
                             value={this.state.filename}
                         >
                         </TextField>
-                        <Button className={classes.button} type="submit">OK</Button>
-                        <Button className={classes.button} onClick={this.onCancel}>Cancel</Button>
+                        <div className="form-buttons">
+                            <Button className={classes.buttonLeft} type="submit">OK</Button>
+                            <Button className={classes.buttonRight} onClick={this.onCancel}>Cancel</Button>
+                        </div>
                     </form>
                 </Paper>
             </DialogContent>

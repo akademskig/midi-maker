@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types"
-import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton, InputBase, Input } from "@material-ui/core";
-import { Settings, CloudDownload, Save, PlayArrow, StopRounded, UndoOutlined, SettingsBackupRestoreRounded, Clear, InputRounded } from '@material-ui/icons';
+import { Grid, FormControl, InputLabel, Select, MenuItem, Switch, FormControlLabel, Modal, Drawer, IconButton, Input } from "@material-ui/core";
+import { Settings, CloudDownload, Save, PlayArrow, StopRounded, UndoOutlined, SettingsBackupRestoreRounded, Clear } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { MidiNumbers } from 'react-piano';
 import ChannelsList from "./ChannelsList"
@@ -113,7 +113,7 @@ class PianoController extends Component {
     }
     onCancel = () => {
         this.setState({
-            newChannelModal: false
+            saveMidiModal: false
         })
     }
     toggleDrawer = (open) => () => {
@@ -244,8 +244,7 @@ class PianoController extends Component {
                                     inputProps={{
                                         name: 'first-note',
                                         id: 'first-note',
-                                    }}
-                                >
+                                    }}>
                                     {
                                         MidiNumbers.NATURAL_MIDI_NUMBERS.map((midiNumber) =>
                                             <MenuItem value={midiNumber} disabled={midiNumber >= noteRange.last} key={midiNumber}> {midiNumbersToNotes[midiNumber]}</MenuItem>

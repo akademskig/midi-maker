@@ -123,5 +123,10 @@ $light-blue: rgb(71, 178, 228);
       color: #EC6F66;
     }
   }
+}
 
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 27px;
 }
