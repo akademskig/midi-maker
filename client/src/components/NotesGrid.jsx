@@ -48,9 +48,6 @@ let RECT_HEIGHT = 15
 const RECT_WIDTH = 30
 const RECT_SPACE = 0.5
 const RECT_COLOR = "rgba(4,32,55,1)"
-// const FIRST_RECT_COLOR = "rgb(255,255,255)"
-// const NOTE_COLOR = "#61dafb"
-// const START_TIME = window.innerWidth / (RECT_WIDTH + RECT_SPACE)
 const RECT_TIME = 5
 const BAR_COLOR = "#d13a1f"
 const RECORDING_BAR_COLOR = "#a0cf33"
@@ -71,11 +68,11 @@ class Canvas extends React.Component {
         playing: false,
         timesRemained: [],
         channelColor: "#f2046d",
-        rectTime: 1 / this.props.noteDuration || RECT_TIME
-    }
+        rectTime: 1 / this.props.noteDuration || RECT_TIME,
 
+    }
+    timerList = []
     drawInitial = (canvas, timer, playAll) => {
-        console.log(this.state.rectTime)
         let joinedEvents = []
         if (this.props.channels.length > 0) {
             this.props.channels.forEach(c => {
@@ -101,14 +98,20 @@ class Canvas extends React.Component {
         this.coordsMap = []
         this.props.notes.forEach((n, i) => {
             for (let j = 0; j < xLength; j++) {
+                // if (i === 0) {
+                //     if (j === 0)
+                //         this.timerList = []
+                //     this.timerList.push(this.timerList.length > 0 ? parseFloat((this.timerList[this.timerList.length - 1] + this.props.noteDuration).toFixed(1)) : parseFloat(this.props.noteDuration.toFixed(1)))
+                // }
+                let x = j * RECT_WIDTH + this.offsetFirst + RECT_SPACE * j
+                let y = i * RECT_HEIGHT + RECT_SPACE * i
                 if (j === 0) {
+
                     c.fillStyle = "white"
                     c.font = `${this.fontSize}12px Arial`
                     c.fillText(n.note, 3, (RECT_HEIGHT / this.fontSize / 2 + this.fontSize) + i * (RECT_HEIGHT + RECT_HEIGHT / (this.fontSize * 2.6)))
                 }
                 else {
-                    let x = j * RECT_WIDTH + this.offsetFirst + RECT_SPACE * j
-                    let y = i * RECT_HEIGHT + RECT_SPACE * i
                     c.fillStyle = RECT_COLOR
                     c.fillRect(x, y, RECT_WIDTH, RECT_HEIGHT);
                     this.coordsMap.push({ midiNumber: n.midiNumber, x, y })
@@ -148,6 +151,8 @@ class Canvas extends React.Component {
             c.fillStyle = this.props.controller.playing ? BAR_COLOR : RECORDING_BAR_COLOR
             c.fillRect(this.lastRect, 0, BAR_WIDTH, canvas.height)
         }
+
+
     }
 
     play = () => {
@@ -292,7 +297,7 @@ class Canvas extends React.Component {
         }
         if (this.props.noteDuration !== newProps.noteDuration) {
             this.setState({
-                rectTime: 1 / newProps.noteDuration
+                rectTime: 1 / newProps.noteDuration,
             })
         }
     }
@@ -306,6 +311,9 @@ class Canvas extends React.Component {
             <div>
                 {this.props.loading ? <CircularProgress></CircularProgress> :
                     <canvas id="canvas" ref="canvas" style={canvasStyle} onClick={this.showCoords} />}
+                {/* <div className="time-indicator">
+                    {this.timerList.forEach(t => (<span>{t}</span>))}
+                </div> */}
             </div>
         )
     }

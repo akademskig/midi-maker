@@ -296,7 +296,7 @@ class PianoControllerProvider extends React.Component {
     }
 
     onChangeNoteDuration=($e)=>{
-        let duration= $e.target.value
+        let duration= parseFloat($e.target.value)
         this.setState({
             noteDuration: duration
         })
