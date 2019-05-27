@@ -66,7 +66,6 @@ class PianoControllerProvider extends React.Component {
             this.addPianoToChannel(value)
     };
     setRecordingGrid = value => {
-
         this.setState({
             recordingGrid: Object.assign({}, this.state.recordingGrid, value),
         });
@@ -108,7 +107,7 @@ class PianoControllerProvider extends React.Component {
         if (this.state.controller.playing)
             return
         this.setController({
-            playing:true
+            playing: true
         })
         this.props.playAll(this.state.channels)
         setTimeout(() => {
@@ -122,7 +121,7 @@ class PianoControllerProvider extends React.Component {
         });
         this.props.stopPlaying()
         this.setController({
-            playing:false
+            playing: false
         })
     };
     // onFinish = () => {
@@ -150,7 +149,7 @@ class PianoControllerProvider extends React.Component {
 
     clearGrid = () => {
         this.setState({
-            recordingGrid: Object.assign({}, this.state.recordingPiano, { events: [], currentTime: 0 }),
+            recordingGrid: Object.assign({}, this.state.recordingGrid, { events: [], currentTime: 0 }),
         });
     }
     clearPiano = () => {
@@ -233,7 +232,9 @@ class PianoControllerProvider extends React.Component {
         this.props.loadChannelInstrument(this.state.instrumentName)
     }
     onRemoveChannel = (key) => {
-        this.onClickClear()
+        const channel = this.state.channels[key]
+        if (channel.instrumentName === this.state.currentChannel.instrumentName)
+            this.onClickClear()
         this.setState({
             channels: this.state.channels.filter((c, i) => i !== key)
         })

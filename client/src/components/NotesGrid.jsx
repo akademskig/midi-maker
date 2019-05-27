@@ -69,7 +69,6 @@ class Canvas extends React.Component {
         timesRemained: [],
         channelColor: "#f2046d",
         rectTime: 1 / this.props.noteDuration || RECT_TIME,
-
     }
     timerList = []
     time = 0
