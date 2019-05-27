@@ -12,7 +12,7 @@ $light-blue: rgb(71, 178, 228);
   padding-top: 5px;
   overflow-y: hidden;
   background: black;
-  align-items: center;
+  justify-content: center;
 
   div {
     text-align: center;
@@ -41,7 +41,6 @@ $light-blue: rgb(71, 178, 228);
 .btn-row-1 {
   max-width: 250px;
 }
-
 
 .ctrl-piano-config-bar {
   width: 250px;
