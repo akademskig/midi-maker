@@ -2,14 +2,14 @@ import {
     config
 } from "../config"
 
-const apiUrl = `${window.location.protocol}//${window.location.hostname}:${config.PORT}`
+const apiUrl = `${window.location.href}`
 
 export const saveMidi = (midiData, filename) => {
     const midiBody = {
         name: filename,
         midiData
     }
-    return fetch(`${apiUrl}/midis/save`, {
+    return fetch(`${apiUrl}midis/save`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -19,6 +19,6 @@ export const saveMidi = (midiData, filename) => {
     }).then((response) => {
         return response.blob()
     }).catch((err) => {
-        console.err(err)
+        console.error(err)
     })
 }
