@@ -6,21 +6,25 @@ $light-blue: rgb(71, 178, 228);
 }
 
 .gridContainer {
-  display: flex;
   overflow-x: scroll;
-  align-items: center;
   padding-top: 5px;
   overflow-y: hidden;
   background: black;
-  justify-content: center;
 
   div {
     text-align: center;
+    position: relative;
+
+    div {
+      top: 32vw;
+      width: 60px !important;
+      height: 60px !important;
+    }
   }
 }
 
 #canvas {
-  cursor: pointer
+  cursor: pointer;
 }
 
 ::-webkit-scrollbar {
