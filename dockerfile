@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10-slim
 
 RUN apt-get update && apt-get install -y apt-utils timidity lame fluid-soundfont-gm
 RUN sed -e 's|^source|#source|' -e '$a source /etc/timidity/fluidr3_gm.cfg' -i /etc/timidity/timidity.cfg && \
@@ -22,6 +22,7 @@ COPY client/package*.json ./
 COPY client ./
 
 RUN npm install && \
+    npm rebuild node-sass && \
     npm run build
 
 WORKDIR /usr/src/midi-maker
