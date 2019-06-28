@@ -8,7 +8,7 @@ const addNew = async (req: Request, res: Response) => {
     const midi = await encodeMidi(midiData)
     let filename = `${process.cwd()}/midis/${req.body.name.replace(/\s/g, "")}`
     fs.writeFileSync(filename + ".mid", Buffer.from(midi.toArray()))
-    await converToMp3(filename)
+    await converToMp3(filename).catch(err => console.error(err))
     res.sendFile(filename + ".mp3")
 }
 
@@ -19,8 +19,8 @@ const converToMp3 = async (file: string) => {
             if (err) {
                 console.error(err)
                 reject(err)
-                return;
-            }            // the *entire* stdout and stderr (buffered)
+                return
+            }
             console.log(`stdout: ${stdout}`);
             console.log(`stderr: ${stderr}`);
             resolve()
