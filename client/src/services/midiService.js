@@ -1,6 +1,3 @@
-import {
-    config
-} from "../config"
 
 const apiUrl = `${window.location.href}`
 
