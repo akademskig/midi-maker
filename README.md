@@ -27,7 +27,7 @@ mkdir midis
 # Finally, start the app:
 npm start
 ```
-## Docker installation
+## Using docker
 
 ### Requirements
 
@@ -36,8 +36,11 @@ npm start
 ### Commands
 
 ```
-# Build docker container
+# Build and run docker container
 
-docker build .
+docker build . -t midimaker
+docker run -p 4321:4321 midimaker
+
+# Open browser on port 4321
 
 ```
